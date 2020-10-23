@@ -1,1 +1,1 @@
-# Tablut-Intelligent-Player
+# Tablut Intelligent Player
