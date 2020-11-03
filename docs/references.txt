@@ -1,6 +1,7 @@
 
 REFERENCES:
   • http://ai.unibo.it/games/boardgamecompetition/tablut
+  • https://github.com/AGalassi/TablutCompetition
 
 
 +---------------------------------------------------------------------------------+
