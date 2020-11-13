@@ -1,11 +1,11 @@
-from fpm_tablut_player import libraries
+from fpm_tablut_player.utils.generic import Utilities
 
 ###
 
 def run():
   print()
   print('OK')
-  print(libraries.Utilities.randomNumber())
+  print(Utilities.randomNumber())
   print()
 
 ###
