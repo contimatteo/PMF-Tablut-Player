@@ -1,3 +1,1 @@
-player @ file:///Users/matteoconti/Projects/University/master/Fundamentals_AI/tablut/ai-player
-sampleproject @ file:///Users/matteoconti/Projects/University/master/Fundamentals_AI/tablut/ai-player
-tablut-player @ file:///Users/matteoconti/Projects/University/master/Fundamentals_AI/tablut/ai-player
+fpm-tablut-player @ file:///Users/matteoconti/Projects/University/master/Fundamentals_AI/tablut/ai-player
