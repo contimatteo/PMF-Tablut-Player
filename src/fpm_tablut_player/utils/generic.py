@@ -1,6 +1,7 @@
 ###
 
 class Utilities:
-  @staticmethod
-  def randomNumber():
-    return 0
+
+    @staticmethod
+    def randomNumber():
+        return 0
