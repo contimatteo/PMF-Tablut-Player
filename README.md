@@ -5,8 +5,8 @@
 ## Table of Contents
 
 - [About the Project](#about-the-project)
-- [The Challenge](#the-challenge)
-- [The Game](#the-game)
+- [Challenge](#challenge)
+- [Game](#game)
 - [Client](#client)
   - [Prerequisites](#client-prerequisites)
   - [Installation](#client-installation)
@@ -26,11 +26,11 @@
 
 ...
 
-## The Challenge
+## Challenge
 
 ...
 
-## The Game
+## Game
 
 ...
 
