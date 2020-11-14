@@ -1,14 +1,14 @@
-from fpm_tablut_player import libraries
+from fpm_tablut_player.utils.generic import Utilities
 
 ###
 
-def run():
+def main():
   print()
   print('OK')
-  print(libraries.Utilities.randomNumber())
+  print(Utilities.randomNumber())
   print()
 
 ###
 
 if __name__ == "__main__":
-    run()
+    main()

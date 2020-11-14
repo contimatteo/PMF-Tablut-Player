@@ -182,7 +182,7 @@ setup(
     ### executes the function `main` from this package when invoked:
     entry_points={  # Optional
         'console_scripts': [
-            'sample=sample:main',
+            'fpm_tablut_player = fpm_tablut_player.__main__:main'
         ],
     },
 
