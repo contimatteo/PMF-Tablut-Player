@@ -2,5 +2,6 @@
 
 class ApiClientRequestSchema:
 
-  def __init__(self):
-    super().__init__()
+    @staticmethod
+    def empty():
+        return 0
