@@ -1,15 +1,16 @@
 
-# Client
+# FPM PLAYER
+
 
 <!-- TABLE OF CONTENTS -->
-## Table of Contents
+<!-- ## Table of Contents
 * [About the Project](#about-the-project)
   * [Built With](#built-with)
 * [Getting Started](#getting-started)
   * [Prerequisites](#prerequisites)
   * [Installation](#installation)
 * [Usage](#usage)
-* [License](#license)
+* [License](#license) -->
 
 
 <!-- ---------------------------------------------------------------------- -->
@@ -17,7 +18,9 @@
 <!-- ---------------------------------------------------------------------- -->
 
 
-## Prerequisites
+## Client
+
+### Prerequisites
 
 ```sh
 $ chmod +x scripts/*
@@ -35,7 +38,7 @@ $ source venv/bin/activate
 
 <!-- ---------------------------------------------------------------------- -->
 
-## Installation
+### Installation
 
 ```sh
 $ pip install wheel
@@ -45,7 +48,7 @@ $ pip install .
 
 <!-- ---------------------------------------------------------------------- -->
 
-## Usage
+### Usage
 
 ```sh
 $ echo "TODO: ..."
@@ -57,9 +60,9 @@ $ echo "TODO: ..."
 <!-- ---------------------------------------------------------------------- -->
 
 
-# Server
+## Server
 
-## Prerequisites
+### Prerequisites
 ```sh
 $ git submodule update --init --recursive --remote
 $ cd server/Tablut
@@ -68,14 +71,14 @@ $ cd server/Tablut
 Next, follow the instructions insde the [README.md](./server/README.md).
 
 
-## Installation
+### Installation
 
 ```sh
 $ ant clean
 $ ant compile
 ```
 
-## Usage
+### Usage
 
 ```sh
 $ ant server
