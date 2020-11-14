@@ -1,0 +1,1 @@
+fpm-tablut-player @ file:///Users/matteoconti/Projects/University/master/Fundamentals_AI/tablut/ai-player

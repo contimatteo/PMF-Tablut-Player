@@ -1,0 +1,12 @@
+### External Modules
+venv/
+
+### Cache & Indexes
+**/__pycache__
+*.pyc
+
+### Editors
+.vscode/
+
+### Extensions
+**/*.bak
