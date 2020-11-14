@@ -1,6 +1,0 @@
-#!/bin/bash
-
-### Install Dependencies
-# pip install wheel
-# pip install -r requirements.txt
-# pip install .
