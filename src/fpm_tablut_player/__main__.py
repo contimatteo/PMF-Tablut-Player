@@ -3,10 +3,10 @@ from fpm_tablut_player.utils.generic import Utilities
 ###
 
 def main():
-  print()
-  print('OK')
-  print(Utilities.randomNumber())
-  print()
+    print()
+    print('OK')
+    print(Utilities.randomNumber())
+    print()
 
 ###
 
