@@ -1,6 +1,6 @@
-#usr/bin/bash
+#!/bin/bash
 
-git submodule update --init --recursive --remote
-
-pip install .
-pip install -r requirements.txt
+### Install Dependencies
+# pip install wheel
+# pip install -r requirements.txt
+# pip install .
