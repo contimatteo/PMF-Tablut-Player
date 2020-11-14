@@ -2,7 +2,7 @@ from fpm_tablut_player.utils.generic import Utilities
 
 ###
 
-def run():
+def main():
   print()
   print('OK')
   print(Utilities.randomNumber())
@@ -11,4 +11,4 @@ def run():
 ###
 
 if __name__ == "__main__":
-    run()
+    main()
