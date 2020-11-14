@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 import fpm_tablut_player.configs as CONFIG
 
