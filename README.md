@@ -1,44 +1,67 @@
-
 # FPM PLAYER
 
-
 <!-- TABLE OF CONTENTS -->
-<!-- ## Table of Contents
-* [About the Project](#about-the-project)
-  * [Built With](#built-with)
-* [Getting Started](#getting-started)
-  * [Prerequisites](#prerequisites)
-  * [Installation](#installation)
-* [Usage](#usage)
-* [License](#license) -->
 
+## Table of Contents
+
+- [About the Project](#about-the-project)
+- [The Challenge](#the-challenge)
+- [The Game](#the-game)
+- [Client](#client)
+  - [Prerequisites](#client-prerequisites)
+  - [Installation](#client-installation)
+  - [Usage](#client-usage)
+- [Server](#server)
+  - [Prerequisites](#server-prerequisites)
+  - [Installation](#server-installation)
+  - [Usage](#server-usage)
+- [Authors](#authors)
+- [Contributions](#contributions)
+- [License](#license)
 
 <!-- ---------------------------------------------------------------------- -->
 <br>
 <!-- ---------------------------------------------------------------------- -->
 
+## About The Project
+
+...
+
+## The Challenge
+
+...
+
+## The Game
+
+...
+
+<!-- ---------------------------------------------------------------------- -->
+<br>
+<!-- ---------------------------------------------------------------------- -->
 
 ## Client
 
-### Prerequisites
+### Client Prerequisites
 
 ```sh
 $ chmod +x scripts/*
 ```
 
 Install a virtualenv:
+
 ```sh
 $ python -m venv venv
 ```
 
 Activate the virtualenv:
+
 ```sh
 $ source venv/bin/activate
 ```
 
 <!-- ---------------------------------------------------------------------- -->
 
-### Installation
+### Client Installation
 
 ```sh
 $ pip install wheel
@@ -48,38 +71,52 @@ $ pip install .
 
 <!-- ---------------------------------------------------------------------- -->
 
-### Usage
+### Client Usage
 
 ```sh
 $ echo "TODO: ..."
 ```
 
-
 <!-- ---------------------------------------------------------------------- -->
 <br>
 <!-- ---------------------------------------------------------------------- -->
 
-
 ## Server
 
-### Prerequisites
+### Server Prerequisites
+
 ```sh
 $ git submodule update --init --recursive --remote
 $ cd server/Tablut
 ```
 
-Next, follow the instructions insde the [README.md](./server/README.md).
+Next, follow the instructions insde the [README.md](https://github.com/AGalassi/TablutCompetition/blob/master/README.md).
 
-
-### Installation
+### Server Installation
 
 ```sh
 $ ant clean
 $ ant compile
 ```
 
-### Usage
+### Server Usage
 
 ```sh
 $ ant server
 ```
+
+<!-- ---------------------------------------------------------------------- -->
+<br>
+<!-- ---------------------------------------------------------------------- -->
+
+## Authors
+
+...
+
+## Contributions
+
+...
+
+## License
+
+...
