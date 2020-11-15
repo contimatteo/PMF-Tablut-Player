@@ -1,23 +1,22 @@
 ###
 
-class _ProcessConfig(dict):
-    HOST: str
-    PORT: int
+_PLAYER_NAME = "FPM"
 
-CLIENT = _ProcessConfig()
-SERVER = _ProcessConfig()
+_SOCKET_WHITE_PLAYER_PORT = 5800
+_SOCKET_BLACK_PLAYER_PORT = 5801
+
+_PLAYER_ROLE_BLACK_ID = "black"
+_PLAYER_ROLE_WHITE_ID = "white"
 
 ###
 
-APP_DEBUG = False
+APP_DEBUG = True
+APP_HOST = '127.0.0.1'
+APP_PORT = None
+APP_ROLE = None
 
-CLIENT.HOST = '127.0.0.1'
-CLIENT.PORT = 5000
+SERVER_HOST = '127.0.0.1'
+SERVER_PORT = None
+SERVER_ROLE = None
 
-PLAYER_NAME = "FPM"
-PLAYER_ROLE = None
-PLAYER_ROLE_BLACK_ID = "black"
-PLAYER_ROLE_WHITE_ID = "white"
-
-SERVER.HOST = None
-SERVER.PORT = None
+GAME_MOVE_TIMEOUT = 60.0

@@ -1,7 +1,14 @@
+from fpm_tablut_player.network import SocketManager as SocketManagerClass
+
 ###
 
-class Game:
+class Game():
+    SocketManager: SocketManagerClass
 
-    @staticmethod
-    def empty():
-        return 0
+    def __init__(self):
+        super(Game, self).__init__()
+        #
+        self.SocketManager = SocketManagerClass()
+
+    def initialize(self):
+        self.SocketManager.connect()
