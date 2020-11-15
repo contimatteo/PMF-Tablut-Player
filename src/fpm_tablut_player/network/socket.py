@@ -20,7 +20,7 @@ class SocketManager:
 
     def __connect(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.socket.connect((CONFIGS.SERVER_HOST, CONFIGS.SERVER_PORT))
 
     def __disconnect(self):
