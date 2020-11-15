@@ -1,7 +1,7 @@
 ###
 
-class Utilities:
+class Player:
 
     @staticmethod
-    def randomNumber():
+    def empty():
         return 0

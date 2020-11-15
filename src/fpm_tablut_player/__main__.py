@@ -1,36 +1,79 @@
+#!/usr/bin/env python3
+
 import sys
-import fpm_tablut_player.configs as CONFIG
+import argparse
+
+import fpm_tablut_player.configs as CONFIGS
+from fpm_tablut_player.libraries import Game
+from fpm_tablut_player.utils import DebugUtils
+
 
 ###
+
 
 def __parse_args():
-    # TODO: missing
-    # ...
-    return None
+    parser = argparse.ArgumentParser(description='Fpm AI Tablut Player')
+    parser.add_argument(
+        '--role',
+        dest='role',
+        choices={CONFIGS._PLAYER_ROLE_BLACK_ID, CONFIGS._PLAYER_ROLE_WHITE_ID},
+        help='player role'
+    )
+    parser.add_argument(
+        '--timeout',
+        dest='timeout',
+        action='store',
+        help='move timeout',
+        default=CONFIGS.GAME_MOVE_TIMEOUT
+    )
+    parser.add_argument(
+        '--server',
+        dest='server',
+        action='store',
+        help='server ip address',
+        default=CONFIGS.SERVER_HOST
+    )
 
-def __play():
-    # TODO: missing
-    # ...
-    return None
+    arguments = parser.parse_args()
+
+    if not arguments.role:
+        parser.print_help()
+        sys.exit()
+
+    if arguments.server:
+        CONFIGS.SERVER_HOST = str(arguments.server)
+    if arguments.timeout:
+        CONFIGS.GAME_MOVE_TIMEOUT = int(arguments.timeout)
+
+    CONFIGS.APP_ROLE = str(arguments.role)
+
+    if CONFIGS.APP_ROLE == CONFIGS._PLAYER_ROLE_BLACK_ID:
+        CONFIGS.SERVER_PORT = CONFIGS._SOCKET_BLACK_PLAYER_PORT
+    else:
+        CONFIGS.SERVER_PORT = CONFIGS._SOCKET_WHITE_PLAYER_PORT
+
+    DebugUtils.space()
+    DebugUtils.info("ROLE         =  {}", [CONFIGS.APP_ROLE])
+    DebugUtils.info("SERVER_PORT  =  {}", [CONFIGS.SERVER_PORT])
+    DebugUtils.space()
+
 
 ###
 
-def entry():
-    __parse_args()
+
+def entry_point():
     print()
-    print(" $ CONFIG.APP_DEBUG             =  {}".format(CONFIG.APP_DEBUG))
-    print(" $ CONFIG.CLIENT.HOST           =  {}".format(CONFIG.CLIENT.HOST))
-    print(" $ CONFIG.CLIENT.PORT           =  {}".format(CONFIG.CLIENT.PORT))
-    print(" $ CONFIG.PLAYER_NAME           =  {}".format(CONFIG.PLAYER_NAME))
-    print(" $ CONFIG.PLAYER_ROLE           =  {}".format(CONFIG.PLAYER_ROLE))
-    print(" $ CONFIG.PLAYER_ROLE_BLACK_ID  =  {}".format(CONFIG.PLAYER_ROLE_BLACK_ID))
-    print(" $ CONFIG.PLAYER_ROLE_WHITE_ID  =  {}".format(CONFIG.PLAYER_ROLE_WHITE_ID))
-    print(" $ CONFIG.SERVER.HOST           =  {}".format(CONFIG.SERVER.HOST))
-    print(" $ CONFIG.SERVER.PORT           =  {}".format(CONFIG.SERVER.PORT))
+    __parse_args()
+    #
+    game = Game()
+    game.start()
+    #
     print()
     sys.exit()
 
+
 ###
 
+
 if __name__ == "__main__":
-    entry()
+    entry_point()

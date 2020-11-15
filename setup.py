@@ -7,12 +7,10 @@ from setuptools import setup, find_packages
 HERE = pathlib.Path(__file__).parent.resolve()
 
 SOURCE_DIR = 'src'
+LICENSE = (HERE / 'LICENSE.txt').read_text(encoding='utf-8')
 LONG_DESCRIPTION = (HERE / 'README.md').read_text(encoding='utf-8')
 
 ###
-
-# Arguments marked as "Required" below must be included for upload to PyPI.
-# Fields marked as "Optional" may be commented out.
 
 setup(
     ### This is the name of your project. The first time you publish this
@@ -76,6 +74,7 @@ setup(
     ### This should be a valid email address corresponding to the author listed
     ### above.
     # author_email='author@example.com',  # Optional
+    author_email='', # Optional
 
     ### Classifiers help users find your project by categorizing it.
     ###
@@ -88,8 +87,8 @@ setup(
         'Development Status :: 3 - Alpha',
 
         ### Indicate who your project is intended for
-        'Intended Audience :: Developers',
-        'Topic :: Software Development :: Build Tools',
+        # 'Intended Audience :: Developers',
+        # 'Topic :: Software Development :: Build Tools',
 
         ### Pick your license as you wish
         'License :: OSI Approved :: MIT License',
@@ -137,6 +136,7 @@ setup(
     ### For an analysis of "install_requires" vs pip's requirements files see:
     ### https://packaging.python.org/en/latest/requirements.html
     # install_requires=['peppercorn'],  # Optional
+    install_requires=[''],
 
     ### List additional groups of dependencies here (e.g. development
     ### dependencies). Users will be able to install these using the "extras"
@@ -163,6 +163,7 @@ setup(
     ###
     ### In this case, 'data_file' will be installed into '<sys.prefix>/my_data'
     # data_files=[('data', ['data/file.txt'])],  # Optional
+    data_files=[],  # Optional
 
     ### To provide executable scripts, use entry points in preference to the
     ### "scripts" keyword. Entry points provide cross-platform support and allow
@@ -173,7 +174,7 @@ setup(
     ### executes the function `main` from this package when invoked:
     entry_points={  # Optional
         'console_scripts': [
-            'fpm_tablut_player = fpm_tablut_player.__main__:entry'
+            'fpm_tablut_player = fpm_tablut_player.__main__:entry_point'
         ],
     },
 
@@ -187,9 +188,9 @@ setup(
     ### maintainers, and where to support the project financially. The key is
     ### what's used to render the link text on PyPI.
     project_urls={  # Optional
-        # 'Bug Reports': 'https://github.com/pypa/sampleproject/issues',
+        'Source': 'https://github.com/contimatteo/Tablut-AI-Player',
+        'Bug Reports': 'https://github.com/contimatteo/Tablut-AI-Player/issues',
         # 'Funding': 'https://donate.pypi.org',
         # 'Say Thanks!': 'http://saythanks.io/to/example',
-        # 'Source': 'https://github.com/pypa/sampleproject/',
     },
 )
