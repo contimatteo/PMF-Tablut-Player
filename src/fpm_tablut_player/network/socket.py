@@ -1,6 +1,7 @@
 import socket
 import json
 import fpm_tablut_player.configs as CONFIGS
+from fpm_tablut_player.libraries import Game
 from fpm_tablut_player.utils import DebugUtils, NetworkUtils
 
 
@@ -69,12 +70,13 @@ class SocketManager:
         initial_state = self.read_json()
         return initial_state
 
-    def __listen(self):
+    def __listen(self, gameInstance: Game):
         DebugUtils.info("Socket: listening ...", [])
         #
         while self.__is_connected():
             message = self.read_json()
             DebugUtils.info("message -> {}", [str(message)])
+            gameInstance.play(message)
         #
         DebugUtils.info("Socket: disconnecting ...", [])
         self.__disconnect()
@@ -84,8 +86,9 @@ class SocketManager:
     def initialize(self):
         return self.__handler(self.__initialize)
 
-    def listen(self):
-        return self.__handler(self.__listen)
+    def listen(self, gameInstance: Game):
+        def listen(_): return self.__listen(gameInstance)
+        return self.__handler(listen)
 
     def send_json(self, obj: dict):
         message = json.dumps(obj)
