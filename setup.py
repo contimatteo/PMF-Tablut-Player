@@ -1,27 +1,16 @@
-"""A setuptools based setup module.
-
-See:
-https://packaging.python.org/guides/distributing-packages-using-setuptools/
-https://github.com/pypa/sampleproject
-"""
+#!/usr/bin/env python3
 
 # Always prefer setuptools over distutils
-from setuptools import setup, find_packages
 import pathlib
+from setuptools import setup, find_packages
 
-here = pathlib.Path(__file__).parent.resolve()
+HERE = pathlib.Path(__file__).parent.resolve()
 
-###
-
-# Get the long description from the README file
-long_description = (here / 'README.md').read_text(encoding='utf-8')
-
-source_dir = 'src'
+SOURCE_DIR = 'src'
+LICENSE = (HERE / 'LICENSE.txt').read_text(encoding='utf-8')
+LONG_DESCRIPTION = (HERE / 'README.md').read_text(encoding='utf-8')
 
 ###
-
-# Arguments marked as "Required" below must be included for upload to PyPI.
-# Fields marked as "Optional" may be commented out.
 
 setup(
     ### This is the name of your project. The first time you publish this
@@ -58,7 +47,7 @@ setup(
     ###
     ### This field corresponds to the "Description" metadata field:
     ### https://packaging.python.org/specifications/core-metadata/#description-optional
-    long_description=long_description,  # Optional
+    long_description=LONG_DESCRIPTION,  # Optional
 
     ### Denotes that our long_description is in Markdown; valid values are
     ### text/plain, text/x-rst, and text/markdown
@@ -85,6 +74,7 @@ setup(
     ### This should be a valid email address corresponding to the author listed
     ### above.
     # author_email='author@example.com',  # Optional
+    author_email='', # Optional
 
     ### Classifiers help users find your project by categorizing it.
     ###
@@ -97,8 +87,8 @@ setup(
         'Development Status :: 3 - Alpha',
 
         ### Indicate who your project is intended for
-        'Intended Audience :: Developers',
-        'Topic :: Software Development :: Build Tools',
+        # 'Intended Audience :: Developers',
+        # 'Topic :: Software Development :: Build Tools',
 
         ### Pick your license as you wish
         'License :: OSI Approved :: MIT License',
@@ -106,7 +96,7 @@ setup(
         ### Specify the Python versions you support here. In particular, ensure
         ### that you indicate you support Python 3. These classifiers are *not*
         ### checked by 'pip install'. See instead 'python_requires' below.
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3 :: Only',
     ],
 
@@ -120,7 +110,7 @@ setup(
 
     ### When your source code is in a subdirectory under the project root, e.g.
     ### `src/`, it is necessary to specify the `package_dir` argument.
-    package_dir={'': source_dir},  # Optional
+    package_dir={'': SOURCE_DIR},  # Optional
 
     ### You can just specify package directories manually here if your project is
     ### simple. Or you can use find_packages().
@@ -131,13 +121,13 @@ setup(
     ###
     ###   py_modules=["my_module"],
     ###
-    packages=find_packages(where=source_dir),  # Required
+    packages=find_packages(where=SOURCE_DIR),  # Required
 
     ### Specify which Python versions you support. In contrast to the
     ### 'Programming Language' classifiers above, 'pip install' will check this
     ### and refuse to install the project if the version does not match. See
     ### https://packaging.python.org/guides/distributing-packages-using-setuptools/#python-requires
-    python_requires='>=3.5, <4',
+    python_requires='>=3.7, <4',
 
     ### This field lists other packages that your project depends on to run.
     ### Any package you put here will be installed by pip when your project is
@@ -146,6 +136,7 @@ setup(
     ### For an analysis of "install_requires" vs pip's requirements files see:
     ### https://packaging.python.org/en/latest/requirements.html
     # install_requires=['peppercorn'],  # Optional
+    install_requires=[''],
 
     ### List additional groups of dependencies here (e.g. development
     ### dependencies). Users will be able to install these using the "extras"
@@ -156,14 +147,14 @@ setup(
     ### Similar to `install_requires` above, these must be valid existing
     ### projects.
     extras_require={  # Optional
-    #     'dev': ['check-manifest'],
-    #     'test': ['coverage'],
+        # 'dev': ['check-manifest'],
+        # 'test': ['coverage'],
     },
 
     ### If there are data files included in your packages that need to be
     ### installed, specify them here.
     package_data={  # Optional
-    #     'sample': ['package_data.dat'],
+        # 'sample': ['package_data.dat'],
     },
 
     ### Although 'package_data' is the preferred approach, in some case you may
@@ -172,6 +163,7 @@ setup(
     ###
     ### In this case, 'data_file' will be installed into '<sys.prefix>/my_data'
     # data_files=[('data', ['data/file.txt'])],  # Optional
+    data_files=[],  # Optional
 
     ### To provide executable scripts, use entry points in preference to the
     ### "scripts" keyword. Entry points provide cross-platform support and allow
@@ -182,7 +174,7 @@ setup(
     ### executes the function `main` from this package when invoked:
     entry_points={  # Optional
         'console_scripts': [
-            'fpm_tablut_player = fpm_tablut_player.__main__:main'
+            'fpm_tablut_player = fpm_tablut_player.__main__:entry_point'
         ],
     },
 
@@ -196,9 +188,9 @@ setup(
     ### maintainers, and where to support the project financially. The key is
     ### what's used to render the link text on PyPI.
     project_urls={  # Optional
-    #     'Bug Reports': 'https://github.com/pypa/sampleproject/issues',
-    #     'Funding': 'https://donate.pypi.org',
-    #     'Say Thanks!': 'http://saythanks.io/to/example',
-    #     'Source': 'https://github.com/pypa/sampleproject/',
+        'Source': 'https://github.com/contimatteo/Tablut-AI-Player',
+        'Bug Reports': 'https://github.com/contimatteo/Tablut-AI-Player/issues',
+        # 'Funding': 'https://donate.pypi.org',
+        # 'Say Thanks!': 'http://saythanks.io/to/example',
     },
 )
