@@ -11,8 +11,8 @@ _PLAYER_ROLE_WHITE_ID = "white"
 ###
 
 APP_DEBUG = True
-APP_HOST = '127.0.0.1'
-APP_PORT = None
+# APP_HOST = '127.0.0.1'
+# APP_PORT = None
 APP_ROLE = None
 
 SERVER_HOST = '127.0.0.1'
@@ -20,3 +20,5 @@ SERVER_PORT = None
 SERVER_ROLE = None
 
 GAME_MOVE_TIMEOUT = 60.0
+
+K = 1
