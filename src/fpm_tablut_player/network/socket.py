@@ -1,7 +1,7 @@
 import socket
 import json
 import fpm_tablut_player.configs as CONFIGS
-from fpm_tablut_player.libraries import Game
+
 from fpm_tablut_player.utils import DebugUtils, NetworkUtils
 
 
@@ -26,9 +26,10 @@ class SocketManager:
 
     def __disconnect(self):
         self.socket.close()
+        self.socket = None
 
     def __is_connected(self):
-        return self.socket or self.socket.fileno() != -1
+        return self.socket is not None and self.socket.fileno() != -1
 
     def __send_raw(self, string: str):
         bytes_sent = self.socket.send(NetworkUtils.integer_request(len(string)))
@@ -58,8 +59,10 @@ class SocketManager:
             return callback()
         except ConnectionRefusedError as e:
             DebugUtils.error("ConnectionRefusedError -> {}", [str(e)])
+            self.__disconnect()
         except Exception as e:
             DebugUtils.error("Exception -> {}", [str(e)])
+            self.__disconnect()
 
     def __initialize(self):
         self.__connect()
@@ -70,7 +73,7 @@ class SocketManager:
         initial_state = self.read_json()
         return initial_state
 
-    def __listen(self, gameInstance: Game):
+    def __listen(self, gameInstance):
         DebugUtils.info("Socket: listening ...", [])
         #
         while self.__is_connected():
@@ -86,8 +89,8 @@ class SocketManager:
     def initialize(self):
         return self.__handler(self.__initialize)
 
-    def listen(self, gameInstance: Game):
-        def listen(_): return self.__listen(gameInstance)
+    def listen(self, gameInstance):
+        def listen(): self.__listen(gameInstance)
         return self.__handler(listen)
 
     def send_json(self, obj: dict):

@@ -1,7 +1,8 @@
+from fpm_tablut_player.algorithms import MontecarloAlgorithm
+from fpm_tablut_player.heuristics import RandomHeuristic
 from fpm_tablut_player.network import SocketManager as SocketManagerClass
-from fpm_tablut_player.utils import DebugUtils
 from fpm_tablut_player.schemas import GameState, GameMove
-from fpm_tablut_player.libraries import RandomHeuristic, MontecarloAlgorithm
+from fpm_tablut_player.utils import DebugUtils
 
 
 ###
@@ -14,34 +15,33 @@ class Game():
     def __init__(self):
         self.SocketManager = SocketManagerClass()
 
-    def __is_finished(self):
+    def __is_finished(self) -> bool:
         return self.SocketManager.socket is None
 
     def __loadGameState(self, stateFromServer: dict):
         self.gameState = GameState(stateFromServer)
 
-    def __computeNextGameMove(self):
+    def __computeNextGameMove(self) -> GameMove:
         tree_without_heuristics = self.gameState.generateSearchTree()
 
         # heuristic
         heuristic = RandomHeuristic()
-        # algorithm
-        algorithm = MontecarloAlgorithm()
-        # next move
-        next_move = GameMove()
-
         # load the tree in the Heuristic class.
         heuristic.loadTree(tree_without_heuristics)
+
         # add heuristic values.
         tree_with_heuristics = heuristic.assignValues()
 
+        # algorithm
+        algorithm = MontecarloAlgorithm()
         # compute the game state that we want to reach.
-        gameStateToReach = algorithm.extract(tree_with_heuristics)
+        gameStateToReach = algorithm.getMorePromisingState(tree_with_heuristics)
 
+        # next move
+        next_move = GameMove()
         # comute the move for going from: {self.gameState} -> to: {gameStateToReach}.
-        next_move.compute(self.gameState, gameStateToReach)
+        next_move.fromStartToEnd(self.gameState, gameStateToReach)
 
-        #
         return next_move
 
     ###
@@ -72,5 +72,6 @@ class Game():
         self.__loadGameState(stateFromServer)
 
         next_move = self.__computeNextGameMove()
+        obj_to_send = next_move.export()
 
-        self.SocketManager.send_json(next_move)
+        self.SocketManager.send_json(obj_to_send)
