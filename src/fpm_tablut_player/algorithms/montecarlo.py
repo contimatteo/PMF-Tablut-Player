@@ -2,7 +2,7 @@
 
 
 class MontecarloAlgorithm():
-    def extract(self, tree_with_heuristics):
+    def getMorePromisingState(self, tree_with_heuristics):
         # ...
         # missing
         # ...
