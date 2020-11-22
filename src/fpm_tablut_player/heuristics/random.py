@@ -3,7 +3,7 @@ from fpm_tablut_player.schemas import GameState
 ###
 
 
-class RandomHeuristic:
+class RandomHeuristic():
     gameState: GameState
 
     def loadTree(self, gameState):
