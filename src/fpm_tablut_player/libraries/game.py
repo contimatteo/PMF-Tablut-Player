@@ -1,7 +1,8 @@
+from fpm_tablut_player.algorithms import MontecarloAlgorithm
+from fpm_tablut_player.heuristics import RandomHeuristic
 from fpm_tablut_player.network import SocketManager as SocketManagerClass
-from fpm_tablut_player.utils import DebugUtils
 from fpm_tablut_player.schemas import GameState, GameMove
-from fpm_tablut_player.libraries import RandomHeuristic, MontecarloAlgorithm
+from fpm_tablut_player.utils import DebugUtils
 
 
 ###
