@@ -1,7 +1,5 @@
 import numpy as np
 
-import fpm_tablut_player.configs as CONFIGS
-
 
 ###
 
@@ -10,7 +8,7 @@ class GameNode():
     depth: int
     turn: str
     moves: list
-    heuristicValue: int = 0
+    heuristic: int = 0
 
     def __init__(self):
         self.turn = None

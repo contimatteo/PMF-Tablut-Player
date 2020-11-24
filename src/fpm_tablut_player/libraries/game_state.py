@@ -16,23 +16,19 @@ class GameState:
         self.board = []
 
     def createFromServerState(self, gameStateRaw):
-        board, turn = gameStateRaw
+        self.turn = str(gameStateRaw["turn"]).lower()
+        board = gameStateRaw["board"]
+        # TODO: missing code.
+        # ...
         self.board = np.array(board)
-        self.turn = turn
 
     def createfromNode(self, initialGameState, node: GameNode):
-        # ...
-        # missing code
+        # TODO: missing code.
         # ...
         return self
 
     def getPossibleMoves(self, turn: str):
-        # missing ...
+        # TODO: missing code.
+        # ...
         return [{'from': (0, 0), 'to': (0, 0)}]
 
-    def generateSearchTree(self):
-        K = CONFIGS.K
-        # ...
-        # missing code
-        # ...
-        return self.board
