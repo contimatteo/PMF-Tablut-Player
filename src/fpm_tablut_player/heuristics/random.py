@@ -1,16 +1,15 @@
-from fpm_tablut_player.schemas import GameState
+from fpm_tablut_player.libraries import GameState, GameTree
 
 ###
 
 
 class RandomHeuristic():
-    gameState: GameState
+    searchTree: GameTree
 
-    def loadTree(self, gameState):
-        self.gameState = gameState
+    def loadTree(self, tree: GameTree):
+        self.searchTree = tree
 
-    def assignValues(self):
+    def assignValues(self) -> GameTree:
+        # TODO: missing code.
         # ...
-        # missing
-        # ...
-        return ""
+        return self.searchTree
