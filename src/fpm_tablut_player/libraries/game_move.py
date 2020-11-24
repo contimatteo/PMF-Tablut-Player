@@ -16,8 +16,7 @@ class GameMove:
         self.turn = str(CONFIGS.APP_ROLE)
 
     def __computeMoveForGoingFromStartToEnd(self, start: GameState, end: GameState) -> (str, str):
-        # ...
-        # missing code
+        # TODO: missing code.
         # ...
         fromCell = "d1"
         toCell = "d2"
