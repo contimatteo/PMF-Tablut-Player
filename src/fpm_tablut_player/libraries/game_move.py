@@ -1,6 +1,6 @@
 import fpm_tablut_player.configs as CONFIGS
 
-from . import GameState
+from fpm_tablut_player.libraries.game_state import GameState
 
 ###
 
@@ -29,6 +29,8 @@ class GameMove:
         (fromCell, toCell) = self.__computeMoveForGoingFromStartToEnd(start, end)
         self.fromCell = fromCell
         self.toCell = toCell
+
+        return self
 
     def export(self):
         return {

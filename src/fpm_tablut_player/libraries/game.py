@@ -1,8 +1,12 @@
+import networkx as nx
+
 from fpm_tablut_player.algorithms import MontecarloAlgorithm
 from fpm_tablut_player.heuristics import RandomHeuristic
 from fpm_tablut_player.network import SocketManager as SocketManagerClass
-from fpm_tablut_player.schemas import GameState, GameMove
+from fpm_tablut_player.libraries import GameState, GameMove, GameTree, GameNode
 from fpm_tablut_player.utils import DebugUtils
+
+import fpm_tablut_player.configs as CONFIGS
 
 
 ###
@@ -11,38 +15,22 @@ from fpm_tablut_player.utils import DebugUtils
 class Game():
     SocketManager: SocketManagerClass
     gameState: GameState
+    gameSearchTree: GameTree
+    turn: str
 
     def __init__(self):
+        self.turn = None
         self.SocketManager = SocketManagerClass()
 
     def __is_finished(self) -> bool:
         return self.SocketManager.socket is None
 
     def __loadGameState(self, stateFromServer: dict):
-        self.gameState = GameState(stateFromServer)
+        self.gameState = GameState()
+        self.gameState.createFromServerState(stateFromServer)
 
-    def __computeNextGameMove(self) -> GameMove:
-        tree_without_heuristics = self.gameState.generateSearchTree()
-
-        # heuristic
-        heuristic = RandomHeuristic()
-        # load the tree in the Heuristic class.
-        heuristic.loadTree(tree_without_heuristics)
-
-        # add heuristic values.
-        tree_with_heuristics = heuristic.assignValues()
-
-        # algorithm
-        algorithm = MontecarloAlgorithm()
-        # compute the game state that we want to reach.
-        gameStateToReach = algorithm.getMorePromisingState(tree_with_heuristics)
-
-        # next move
-        next_move = GameMove()
-        # comute the move for going from: {self.gameState} -> to: {gameStateToReach}.
-        next_move.fromStartToEnd(self.gameState, gameStateToReach)
-
-        return next_move
+    def __is_my_turn(self) -> bool:
+        return str(self.turn) == str(CONFIGS.APP_ROLE)
 
     ###
 
@@ -69,9 +57,80 @@ class Game():
         ###
 
     def play(self, stateFromServer: dict):
+        # parse turn "value" from the server
+        self.turn = str(stateFromServer["turn"]).lower()
+
+        # check if is my turn.
+        if not self.__is_my_turn():
+            return
+        else:
+            DebugUtils.info("stateFromServer -> {}", [str(stateFromServer)])
+
+        #
         self.__loadGameState(stateFromServer)
 
+        #
         next_move = self.__computeNextGameMove()
         obj_to_send = next_move.export()
 
+        #
         self.SocketManager.send_json(obj_to_send)
+
+    def __computeNextGameMove(self) -> GameMove:
+        self.__generateSearchTree()
+
+        # heuristic
+        heuristic = RandomHeuristic()
+        # load the tree in the Heuristic class.
+        heuristic.loadTree(self.gameSearchTree)
+
+        # add heuristic values.
+        self.gameSearchTree = heuristic.assignValues()
+
+        # algorithm
+        algorithm = MontecarloAlgorithm()
+        # compute the game state that we want to reach.
+        nodeToReach: GameNode = algorithm.getMorePromisingState(self.gameSearchTree)
+        # convert the `nodeToReach` to a state
+        gameStateToReach: GameState = GameState().createfromNode(self.gameState, nodeToReach)
+
+        # comute the move for going from: {self.gameState} -> to: {gameStateToReach}.
+        next_move: GameMove = GameMove().fromStartToEnd(self.gameState, gameStateToReach)
+        #
+        return next_move
+
+    def __generateSearchTree(self) -> GameTree:
+        currentTurn = CONFIGS.APP_ROLE
+        rootNode = GameNode().initialize(currentTurn, [], 0)
+
+        # create the tree
+        self.gameSearchTree = GameTree().initialize(rootNode)
+        # prepare the queue for visiting the nodes.
+        nodesToVisit: [GameNode] = [rootNode]
+
+        #
+        for currentRootNode in nodesToVisit:
+            currentGameState: GameState = GameState().createfromNode(self.gameState, currentRootNode)
+            # check the `max-depth` limit configutation.
+            if currentRootNode.depth > CONFIGS.K:
+                continue
+            #
+            for move in currentGameState.getPossibleMoves(currentRootNode.turn):
+                depth = currentRootNode.depth + 1
+                nextTurn = Game.togglTurn(currentTurn)
+                movesToSave = currentRootNode.moves + [move]
+                #
+                newNode = GameNode().initialize(nextTurn, movesToSave, depth)
+                #
+                self.gameSearchTree.addNode([newNode])
+                #
+                nodesToVisit.append(newNode)
+
+    ###
+
+    @staticmethod
+    def togglTurn(turn: str):
+        if turn == 'white':
+            return 'black'
+
+        return 'white'

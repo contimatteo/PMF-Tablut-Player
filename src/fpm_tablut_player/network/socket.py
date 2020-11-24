@@ -78,7 +78,6 @@ class SocketManager:
         #
         while self.__is_connected():
             message = self.read_json()
-            DebugUtils.info("message -> {}", [str(message)])
             gameInstance.play(message)
         #
         DebugUtils.info("Socket: disconnecting ...", [])
