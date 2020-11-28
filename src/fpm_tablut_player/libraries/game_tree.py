@@ -10,10 +10,10 @@ from fpm_tablut_player.libraries.game_node import GameNode
 
 class GameTree():
     root: GameNode
-    graph: nx.Graph
+    graph: nx.DiGraph
 
     def __init__(self):
-        self.graph = nx.Graph()
+        self.graph = nx.DiGraph()
         self.root = None
 
     ###
@@ -26,11 +26,28 @@ class GameTree():
         for node in nodes:
             self.graph.add_edge(self.root, node, weight=0)
 
-    def bfs(self, withRootNode: bool = False) -> [GameNode]:
-        root = self.root
-        edges = nx.bfs_edges(self.graph, root)
+    @staticmethod
+    def getChildren(graph: nx.DiGraph,node: GameNode,inverse: bool = False) -> [GameNode]:
 
-        if withRootNode:
-            return [root] + [v for u, v in edges]
+        edges = list(nx.bfs_edges(graph, node))
+        if inverse:
+            L=[]
+            for u, v in edges:
+                L=[v]+L
+            return L
 
         return [v for u, v in edges]
+
+    def bfs(self, withRootNode: bool = False) -> [GameNode]:
+        root = self.root
+
+        if withRootNode:
+            return [root] + GameTree.getChildren(self.graph,root)
+
+        return GameTree.getChildren(self.graph,root)
+
+        #edges = nx.bfs_edges(self.graph, root)
+        #if withRootNode:
+        #    return [root] + [v for u, v in edges]
+        #
+        #return [v for u, v in edges]

@@ -30,5 +30,10 @@ class GameState:
     def getPossibleMoves(self, turn: str):
         # TODO: missing code.
         # ...
-        return [{'from': (0, 0), 'to': (0, 0)}]
+        return [
+            {'from': (0, 3), 'to': (1, 3)},
+            {'from': (3, 0), 'to': (3, 1)},
+            {'from': (3, 8), 'to': (3, 7)},
+            {'from': (8, 3), 'to': (7, 3)}
+        ]
 
