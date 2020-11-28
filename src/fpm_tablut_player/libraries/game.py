@@ -1,6 +1,6 @@
 import networkx as nx
 
-from fpm_tablut_player.algorithms import MontecarloAlgorithm
+from fpm_tablut_player.algorithms import MontecarloAlgorithm, MinMaxAlgorithm
 from fpm_tablut_player.heuristics import RandomHeuristic
 from fpm_tablut_player.network import SocketManager as SocketManagerClass
 from fpm_tablut_player.libraries import GameState, GameMove, GameTree, GameNode
@@ -34,7 +34,7 @@ class Game():
 
     def __generateSearchTree(self) -> GameTree:
         currentTurn = CONFIGS.APP_ROLE
-        rootNode = GameNode().initialize(currentTurn, [], 0)
+        rootNode = GameNode().initialize(None,currentTurn, [], 0)
 
         # create the tree
         self.searchTree = GameTree().initialize(rootNode)
@@ -45,15 +45,18 @@ class Game():
         for currentRootNode in nodesToVisit:
             currentGameState: GameState = GameState().createfromNode(self.gameState, currentRootNode)
             # check the `max-depth` limit configutation.
-            if currentRootNode.depth > CONFIGS.K:
+            if currentRootNode.depth >= CONFIGS.K:
                 continue
             #
             for move in currentGameState.getPossibleMoves(currentRootNode.turn):
+                
                 depth = currentRootNode.depth + 1
                 nextTurn = Game.togglTurn(currentTurn)
-                movesToSave = currentRootNode.moves + [move]
+                movesToSave = list(currentRootNode.moves) + [move]
                 #
-                newNode = GameNode().initialize(nextTurn, movesToSave, depth)
+                newNode = GameNode().initialize(currentRootNode,nextTurn, movesToSave, depth);
+                
+                
                 #
                 self.searchTree.addNode([newNode])
                 #
@@ -61,17 +64,20 @@ class Game():
 
     def __computeNextGameMove(self) -> GameMove:
         self.__generateSearchTree()
-
+        
         # heuristic
         heuristic = RandomHeuristic()
         # load the tree in the Heuristic class.
         heuristic.loadTree(self.searchTree)
 
+        #print("ECCOMI LAAAAAAAAAAAAAAAAAAAAAAAAAAAAa")
         # add heuristic values.
         self.searchTree = heuristic.assignValues()
+        #print("ENDDDDDDDDDDDDDDDDDDDDD")
 
         # algorithm
-        algorithm = MontecarloAlgorithm()
+        algorithm = MinMaxAlgorithm()
+        #algorithm = MontecarloAlgorithm()
         # compute the game state that we want to reach.
         nodeToReach: GameNode = algorithm.getMorePromisingState(self.searchTree)
         # convert the `nodeToReach` to a state
