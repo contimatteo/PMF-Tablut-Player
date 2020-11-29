@@ -5,9 +5,9 @@ from fpm_tablut_player.utils import DebugUtils
 ###
 
 
-class MinMaxAlgorithm():
-    max: str = "white" 
-    min: str = "black" 
+class AlphaBetaCutAlgorithm():
+    max: str = "white"
+    min: str = "black"
 
     ###
 
@@ -19,18 +19,36 @@ class MinMaxAlgorithm():
             if x == node and x.heuristic is not None:
                 L.pop()
             elif x.heuristic is not None:
+                alpha = None
+                beta = None
+
                 if x.parent.heuristic is None:
                     x.parent.heuristic = x.heuristic
+                    x.parent.parent.heuristic = x.heuristic
+
                 elif x.parent.turn == self.min and x.heuristic < x.parent.heuristic:
                     x.parent.heuristic = x.heuristic
                 elif x.parent.turn == self.max and x.heuristic > x.parent.heuristic:
                     x.parent.heuristic = x.heuristic
 
-                L.pop()
+                if x.parent.turn == min:
+                    beta = x.parent.heuristic
+                    alpha = x.parent.parent.heuristic
+                else:
+                    alpha = x.parent.heuristic
+                    beta = x.parent.parent.heuristic
+
+                if alpha > beta:
+                    while x.parent.numberChildren > 0:
+                        L.pop()
+                        x.parent.numberChildren = x.parent.numberChildren - 1
+                    L.pop() # remove x.parent
             else:
                 children = GameTree.getChildren(tree_with_heuristics.graph, x, True)
+                x.numberChildren = len(children)
+
                 if len(children) > 0:
-                    L = L + children
+                    L = L+children
 
     ###
 
@@ -40,8 +58,8 @@ class MinMaxAlgorithm():
         root = tree_with_heuristics.root
         children = GameTree.getChildren(tree_with_heuristics.graph, root, False)
 
-        bestNode = None
         heuristicValue = None
+        bestNode = None
 
         # print("root heuristic value ",root.heuristic," turn ",root.turn)
 

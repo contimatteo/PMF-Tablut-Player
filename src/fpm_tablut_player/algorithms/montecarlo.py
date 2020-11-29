@@ -24,4 +24,5 @@ class MontecarloAlgorithm():
 
         DebugUtils.info("Montecarlo best move is {}", [str(Children[selectedIndex].moves)])
         DebugUtils.space()
+
         return Children[selectedIndex]

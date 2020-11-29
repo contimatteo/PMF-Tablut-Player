@@ -45,7 +45,7 @@ class Game():
 
         #
         for currentRootNode in nodesToVisit:
-            currentGameState: GameState = GameState().createfromNode(self.gameState, currentRootNode)
+            currentGameState = GameState().createfromNode(self.gameState, currentRootNode)
             # check the `max-depth` limit configutation.
             if currentRootNode.depth >= CONFIGS.K:
                 continue
