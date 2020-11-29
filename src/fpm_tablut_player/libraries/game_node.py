@@ -17,7 +17,7 @@ class GameNode():
         self.moves = []
         self.numberChildren=0
 
-    def initialize(self,parentNode, turn: str, moves: list, depth: int = 0):
+    def initialize(self, parentNode, turn: str, moves: list, depth: int = 0):
         self.depth = depth
         self.turn = turn
         self.moves = np.array(moves)
