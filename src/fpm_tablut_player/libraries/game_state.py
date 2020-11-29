@@ -31,7 +31,7 @@ class GameState:
         #
         return self
 
-    def getPossibleMoves(self, turn: str):
+    def getPossibleMoves(self, turn: str) -> list:
         #
         # TODO: missing code.
         # ...

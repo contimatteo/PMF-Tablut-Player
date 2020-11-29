@@ -16,7 +16,7 @@ class MinMaxAlgorithm():
         L = [node]
         while len(L) > 0:
             x = L[-1]
-            if x == node and x.heuristic != None:
+            if x == node and x.heuristic is not None:
                 L.pop()
             elif x.heuristic is not None:
                 if x.parent.heuristic is None:
