@@ -10,6 +10,7 @@ class GameNode():
     moves: list
     heuristic: int
     numberChildren: int
+    debugIndex: int
     parent = None
 
     def __init__(self):

@@ -44,7 +44,8 @@ class GameTree():
 
     @staticmethod
     def getChildren(graph: nx.DiGraph, node: GameNode, inverse: bool = False) -> [GameNode]:
-        edges = list(nx.bfs_edges(graph, node))
+        #edges = list(nx.bfs_edges(graph, node))
+        edges = list(graph.edges(node))
         if inverse:
             L = []
             for u, v in edges:
