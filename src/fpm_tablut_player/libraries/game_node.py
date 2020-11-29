@@ -5,20 +5,20 @@ import numpy as np
 
 
 class GameNode():
-    depth: int
     turn: str
+    depth: int
     moves: list
-    heuristic: int = None
     parent = None
+    heuristic: int = None
 
     def __init__(self):
-        self.turn = None
         self.moves = []
+        self.turn = None
 
-    def initialize(self,parentNode, turn: str, moves: list, depth: int = 0):
-        self.depth = depth
+    def initialize(self, parentNode, turn: str, moves: list, depth: int = 0):
         self.turn = turn
-        self.moves = np.array(moves)
+        self.depth = depth
         self.parent = parentNode
+        self.moves = np.array(moves)
 
         return self

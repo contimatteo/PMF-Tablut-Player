@@ -1,7 +1,9 @@
-from fpm_tablut_player.libraries import GameState, GameTree, GameNode;
+import random
+import networkx as nx
+
+from fpm_tablut_player.libraries import GameState, GameTree, GameNode
 from fpm_tablut_player.utils import DebugUtils
-import networkx as nx;
-import random;
+
 ###
 
 
@@ -12,34 +14,36 @@ class RandomHeuristic():
         self.searchTree = tree
 
     def getLeaves(self) -> [GameNode]:
-        leaves=[];
-        controlsNode=[self.searchTree.root];
-        graph=self.searchTree.graph;
-        node=None;
+        leaves = []
+        node = None
+        graph = self.searchTree.graph
+        controlsNode = [self.searchTree.root]
 
-        while len(controlsNode)>0:
-            #print("ELEMENT TO CONTROL ARE: ",len(controlsNode))
-            node=controlsNode.pop(0);
-            children = list(nx.bfs_edges(graph, node));
-            #print("we have ",len(children),"children")
+        while len(controlsNode) > 0:
+            # print("ELEMENT TO CONTROL ARE: ",len(controlsNode))
+            node = controlsNode.pop(0)
+            children = list(nx.bfs_edges(graph, node))
+            # print("we have ",len(children),"children")
             if len(children) == 0:
-                leaves.append(node);
+                leaves.append(node)
             else:
-                for u,v in children:
-                    controlsNode.append(v);
+                for u, v in children:
+                    controlsNode.append(v)
 
-        return leaves;
+        return leaves
 
     def assignValues(self) -> GameTree:
-        #print("TREE HAS ",len(self.searchTree.graph)," NODES")
-        #print("\n\nSTART COMPUTING EURISTIC");
-        leaves=self.getLeaves();
-        #print("LEAVES COMPUTED");
-        for leaf in leaves:
-            leaf.heuristic = random.randint(1,101);
+        # print("TREE HAS ",len(self.searchTree.graph)," NODES")
+        # print("\n\nSTART COMPUTING EURISTIC");
+        leaves = self.getLeaves()
 
-        #print("NUMERO DI FOGLIE: ",len(leaves));
+        # print("LEAVES COMPUTED");
         for leaf in leaves:
-            DebugUtils.info("heuristic selected for  {} is {}",[leaf.moves,leaf.heuristic])
+            leaf.heuristic = random.randint(1, 101)
+
+        # print("NUMERO DI FOGLIE: ",len(leaves));
+        for leaf in leaves:
+            DebugUtils.info("heuristic selected for  {} is {}", [leaf.moves, leaf.heuristic])
         DebugUtils.space()
+        
         return self.searchTree

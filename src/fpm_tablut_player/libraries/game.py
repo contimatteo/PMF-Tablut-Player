@@ -1,10 +1,10 @@
-import networkx as nx
+# import networkx as nx
 
-from fpm_tablut_player.algorithms import MontecarloAlgorithm, MinMaxAlgorithm
+from fpm_tablut_player.algorithms import MinMaxAlgorithm
 from fpm_tablut_player.heuristics import RandomHeuristic
 from fpm_tablut_player.network import SocketManager as SocketManagerClass
 from fpm_tablut_player.libraries import GameState, GameMove, GameTree, GameNode
-from fpm_tablut_player.utils import DebugUtils
+from fpm_tablut_player.utils import DebugUtils, GameUtils
 
 import fpm_tablut_player.configs as CONFIGS
 
@@ -13,10 +13,12 @@ import fpm_tablut_player.configs as CONFIGS
 
 
 class Game():
-    SocketManager: SocketManagerClass
+    turn: str
     gameState: GameState
     searchTree: GameTree
-    turn: str
+    SocketManager: SocketManagerClass
+
+    ###
 
     def __init__(self):
         self.turn = None
@@ -34,7 +36,7 @@ class Game():
 
     def __generateSearchTree(self) -> GameTree:
         currentTurn = CONFIGS.APP_ROLE
-        rootNode = GameNode().initialize(None,currentTurn, [], 0)
+        rootNode = GameNode().initialize(None, currentTurn, [], 0)
 
         # create the tree
         self.searchTree = GameTree().initialize(rootNode)
@@ -49,22 +51,18 @@ class Game():
                 continue
             #
             for move in currentGameState.getPossibleMoves(currentRootNode.turn):
-                
                 depth = currentRootNode.depth + 1
-                nextTurn = Game.togglTurn(currentTurn)
+                nextTurn = GameUtils.togglTurn(currentTurn)
                 movesToSave = list(currentRootNode.moves) + [move]
                 #
-                newNode = GameNode().initialize(currentRootNode,nextTurn, movesToSave, depth);
-                
-                
-                #
-                self.searchTree.addNode([newNode])
+                newNode = GameNode().initialize(currentRootNode, nextTurn, movesToSave, depth)
                 #
                 nodesToVisit.append(newNode)
+                self.searchTree.addNode([newNode])
 
     def __computeNextGameMove(self) -> GameMove:
         self.__generateSearchTree()
-        
+
         # heuristic
         heuristic = RandomHeuristic()
         # load the tree in the Heuristic class.
@@ -73,18 +71,19 @@ class Game():
         #print("ECCOMI LAAAAAAAAAAAAAAAAAAAAAAAAAAAAa")
         # add heuristic values.
         self.searchTree = heuristic.assignValues()
-        #print("ENDDDDDDDDDDDDDDDDDDDDD")
+        # print("ENDDDDDDDDDDDDDDDDDDDDD")
 
         # algorithm
         algorithm = MinMaxAlgorithm()
-        #algorithm = MontecarloAlgorithm()
+        # algorithm = MontecarloAlgorithm()
         # compute the game state that we want to reach.
-        nodeToReach: GameNode = algorithm.getMorePromisingState(self.searchTree)
+        nodeToReach: GameNode = algorithm.getMorePromisingNode(self.searchTree)
+
         # convert the `nodeToReach` to a state
-        gameStateToReach: GameState = GameState().createfromNode(self.gameState, nodeToReach)
+        gameStateToReach = GameState().createfromNode(self.gameState, nodeToReach)
 
         # comute the move for going from: {self.gameState} -> to: {gameStateToReach}.
-        next_move: GameMove = GameMove().fromStartToEnd(self.gameState, gameStateToReach)
+        next_move = GameMove().fromStartToEnd(self.gameState, gameStateToReach)
         #
         return next_move
 
@@ -100,21 +99,9 @@ class Game():
         while not self.__is_finished():
             self.SocketManager.listen(self)
 
-        ###
-        # 1. Capire quando il gioco finisce
-        # 2. Funzione per capire se una mossa è valida
-        # 3. Finchè non finisce il gicoo
-        # 1. leggere lo stato del gioco (dal server)
-        # 2. salvarcelo in una nostra struttura (`GameState`)
-        # 3. calcolare tutte le mosse valide fino al livello `k` (=1)
-        # 4. calcolo dell'eurisitca per ogni nodo (anche al punto prima volendo)
-        # 5. algortimo di ricerca (montecarlo, ...)
-        # 6. trovata la prossima mossa, mandarla al server
-        ###
-
     def play(self, stateFromServer: dict):
         # parse turn "value" from the server
-        self.turn = str(stateFromServer["turn"]).lower()
+        self.turn = GameUtils.turnToString(stateFromServer["turn"])
 
         # check if is my turn.
         if not self.__is_my_turn():
@@ -122,21 +109,11 @@ class Game():
         else:
             DebugUtils.info("stateFromServer -> {}", [str(stateFromServer)])
 
-        #
+        # convert the state received from the server to a {GameState} instance.
         self.__loadGameState(stateFromServer)
 
-        #
+        # extract the "best" move for my player.
         next_move = self.__computeNextGameMove()
-        obj_to_send = next_move.export()
 
-        #
-        self.SocketManager.send_json(obj_to_send)
-
-    ###
-
-    @staticmethod
-    def togglTurn(turn: str):
-        if turn == 'white':
-            return 'black'
-
-        return 'white'
+        # send the move to the server.
+        self.SocketManager.send_json(next_move.export())
