@@ -20,7 +20,7 @@ class GameMove:
     def __init__(self):
         self.fromCell = None
         self.toCell = None
-        self.turn = str(CONFIGS.APP_ROLE)
+        self.turn = str(CONFIGS.APP_ROLE).lower()
 
     def __convertCellToServerFormat(self, x: int, y: int) -> str:
         if x < 0 or x > (ROWS_SIZE - 1):
@@ -33,8 +33,9 @@ class GameMove:
 
     def __getMoveForReachingState(self, start: GameState, end: GameState) -> (tuple, tuple):
         #
-        # TODO: missing code.
+        # TODO: [@contimatteo] missing code.
         # ...
+        # gameMove = start.getMoveForReaching(stateToReach: GameState) (board = .state)
         #
         fromCell = (3, 1)  # "d1"
         toCell = (3, 2)  # "d2"
@@ -54,7 +55,7 @@ class GameMove:
 
     def export(self):
         return {
+            "turn": self.turn,
             "from": self.fromCell,
-            "to": self.toCell,
-            "turn": self.turn
+            "to": self.toCell
         }

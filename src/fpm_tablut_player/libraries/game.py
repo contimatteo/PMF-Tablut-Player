@@ -45,7 +45,7 @@ class Game():
 
         #
         for currentRootNode in nodesToVisit:
-            currentGameState = GameState().createfromNode(self.gameState, currentRootNode)
+            currentGameState = GameState().createfromGameNode(self.gameState, currentRootNode)
             # check the `max-depth` limit configutation.
             if currentRootNode.depth >= CONFIGS.K:
                 continue
@@ -63,10 +63,8 @@ class Game():
     def __computeNextGameMove(self) -> GameMove:
         self.__generateSearchTree()
 
-        # heuristic
-        heuristic = RandomHeuristic()
         # load the tree in the Heuristic class.
-        heuristic.loadTree(self.searchTree)
+        heuristic = RandomHeuristic().loadTree(self.searchTree)
 
         #print("ECCOMI LAAAAAAAAAAAAAAAAAAAAAAAAAAAAa")
         # add heuristic values.
@@ -80,7 +78,7 @@ class Game():
         nodeToReach: GameNode = algorithm.getMorePromisingNode(self.searchTree)
 
         # convert the `nodeToReach` to a state
-        gameStateToReach = GameState().createfromNode(self.gameState, nodeToReach)
+        gameStateToReach = GameState().createfromGameNode(self.gameState, nodeToReach)
 
         # comute the move for going from: {self.gameState} -> to: {gameStateToReach}.
         next_move = GameMove().fromStartToEnd(self.gameState, gameStateToReach)

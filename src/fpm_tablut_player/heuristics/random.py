@@ -1,7 +1,7 @@
 import random
 import networkx as nx
 
-from fpm_tablut_player.libraries import GameState, GameTree, GameNode
+from fpm_tablut_player.libraries import GameTree, GameNode
 from fpm_tablut_player.utils import DebugUtils
 
 ###
@@ -12,6 +12,7 @@ class RandomHeuristic():
 
     def loadTree(self, tree: GameTree):
         self.searchTree = tree
+        return self
 
     def getLeaves(self) -> [GameNode]:
         leaves = []
@@ -33,6 +34,10 @@ class RandomHeuristic():
         return leaves
 
     def assignValues(self) -> GameTree:
+        #
+        # TODO: [@all] missing code.
+        # ...
+        #
         # print("TREE HAS ",len(self.searchTree.graph)," NODES")
         # print("\n\nSTART COMPUTING EURISTIC");
         leaves = self.getLeaves()
