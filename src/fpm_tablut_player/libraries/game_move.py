@@ -4,6 +4,14 @@ from fpm_tablut_player.libraries.game_state import GameState
 
 ###
 
+ROW_NAMES: list = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+COL_NAMES: list = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+ROWS_SIZE: int = len(ROW_NAMES)
+COLS_SIZE: int = len(COL_NAMES)
+
+
+###
+
 
 class GameMove:
     fromCell: str
@@ -13,27 +21,42 @@ class GameMove:
     def __init__(self):
         self.fromCell = None
         self.toCell = None
-        self.turn = str(CONFIGS.APP_ROLE)
+        self.turn = str(CONFIGS.APP_ROLE).lower()
 
-    def __computeMoveForGoingFromStartToEnd(self, start: GameState, end: GameState) -> (str, str):
-        # TODO: missing code.
+    def __convertCellToServerFormat(self, x: int, y: int) -> str:
+        if x < 0 or x > (ROWS_SIZE - 1):
+            raise Exception("Wrong X cell (index) selected.")
+
+        if y < 0 or y > (COLS_SIZE - 1):
+            raise Exception("Wrong Y cell (index) selected.")
+
+        return "{}{}".format(str(COL_NAMES[y]), str(ROW_NAMES[x]))
+
+    def __getMoveForReachingState(self, start: GameState, end: GameState) -> (tuple, tuple):
+        #
+        # TODO: [@contimatteo] missing code.
         # ...
-        fromCell = "d1"
-        toCell = "d2"
+        # gameMove = start.getMoveForReaching(stateToReach: GameState) (board = .state)
+        #
+        fromCell = (3, 1)  # "d1"
+        toCell = (3, 2)  # "d2"
+        #
         return (fromCell, toCell)
 
     ###
 
     def fromStartToEnd(self, start: GameState, end: GameState):
-        (fromCell, toCell) = self.__computeMoveForGoingFromStartToEnd(start, end)
-        self.fromCell = fromCell
-        self.toCell = toCell
+        (fromCell, toCell) = self.__getMoveForReachingState(start, end)
+
+        # (int,int) --> str
+        self.fromCell = self.__convertCellToServerFormat(fromCell[0], fromCell[1])
+        self.toCell = self.__convertCellToServerFormat(toCell[0], toCell[1])
 
         return self
 
     def export(self):
         return {
+            "turn": self.turn,
             "from": self.fromCell,
-            "to": self.toCell,
-            "turn": self.turn
+            "to": self.toCell
         }
