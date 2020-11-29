@@ -1,6 +1,5 @@
 import numpy as np
 
-import fpm_tablut_player.configs as CONFIGS
 from fpm_tablut_player.libraries.game_node import GameNode
 from fpm_tablut_player.utils import GameUtils
 

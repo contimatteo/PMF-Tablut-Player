@@ -47,6 +47,9 @@ class Game():
         for currentRootNode in nodesToVisit:
             currentGameState = GameState().createfromGameNode(self.gameState, currentRootNode)
             # check the `max-depth` limit configutation.
+            # 
+            # TODO: [@contimatteo] use a Timer to stop the search.
+            # 
             if currentRootNode.depth >= CONFIGS.K:
                 continue
             #
@@ -93,6 +96,9 @@ class Game():
 
         DebugUtils.info("initial state = {}", [initial_state])
         DebugUtils.space()
+
+        # try to play (if I'm the white player ...).
+        self.play(initial_state)
 
         while not self.__is_finished():
             self.SocketManager.listen(self)

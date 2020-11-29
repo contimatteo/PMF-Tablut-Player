@@ -4,10 +4,11 @@ from fpm_tablut_player.libraries.game_state import GameState
 
 ###
 
-ROW_NAMES: list = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
-COL_NAMES: list = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+ROW_NAMES: list = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+COL_NAMES: list = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
 ROWS_SIZE: int = len(ROW_NAMES)
 COLS_SIZE: int = len(COL_NAMES)
+
 
 ###
 
@@ -29,7 +30,7 @@ class GameMove:
         if y < 0 or y > (COLS_SIZE - 1):
             raise Exception("Wrong Y cell (index) selected.")
 
-        return "{}{}".format(str(ROW_NAMES[x]), str(COL_NAMES[y]))
+        return "{}{}".format(str(COL_NAMES[y]), str(ROW_NAMES[x]))
 
     def __getMoveForReachingState(self, start: GameState, end: GameState) -> (tuple, tuple):
         #
