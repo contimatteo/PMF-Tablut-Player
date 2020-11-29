@@ -1,7 +1,7 @@
-import numpy as np
+# import numpy as np
 import networkx as nx
 
-import fpm_tablut_player.configs as CONFIGS
+# import fpm_tablut_player.configs as CONFIGS
 from fpm_tablut_player.libraries.game_node import GameNode
 
 
@@ -26,28 +26,29 @@ class GameTree():
         for node in nodes:
             self.graph.add_edge(self.root, node, weight=0)
 
-    @staticmethod
-    def getChildren(graph: nx.DiGraph,node: GameNode,inverse: bool = False) -> [GameNode]:
-
-        edges = list(nx.bfs_edges(graph, node))
-        if inverse:
-            L=[]
-            for u, v in edges:
-                L=[v]+L
-            return L
-
-        return [v for u, v in edges]
-
     def bfs(self, withRootNode: bool = False) -> [GameNode]:
         root = self.root
 
         if withRootNode:
-            return [root] + GameTree.getChildren(self.graph,root)
+            return [root] + GameTree.getChildren(self.graph, root)
 
-        return GameTree.getChildren(self.graph,root)
+        return GameTree.getChildren(self.graph, root)
 
-        #edges = nx.bfs_edges(self.graph, root)
-        #if withRootNode:
+        # edges = nx.bfs_edges(self.graph, root)
+        # if withRootNode:
         #    return [root] + [v for u, v in edges]
         #
-        #return [v for u, v in edges]
+        # return [v for u, v in edges]
+
+    ###
+
+    @staticmethod
+    def getChildren(graph: nx.DiGraph, node: GameNode, inverse: bool = False) -> [GameNode]:
+        edges = list(nx.bfs_edges(graph, node))
+        if inverse:
+            L = []
+            for u, v in edges:
+                L = [v]+L
+            return L
+
+        return [v for u, v in edges]
