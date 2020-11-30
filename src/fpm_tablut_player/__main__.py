@@ -43,7 +43,15 @@ def __parse_args():
     if arguments.server:
         CONFIGS.SERVER_HOST = str(arguments.server)
     if arguments.timeout:
-        CONFIGS.GAME_MOVE_TIMEOUT = int(arguments.timeout)
+        timeout = float(arguments.timeout)
+        threshold = float(CONFIGS._GAME_TIMEOUT_SAFEZONE)
+        if timeout > 10 and timeout > threshold:
+            CONFIGS.GAME_MOVE_TIMEOUT = timeout - 10
+        else:
+            raise Exception("Timeout argument must be at least {:}".format(threshold))
+
+    CONFIGS.GAME_TREE_GENERATION_TIMEOUT = float(CONFIGS.GAME_MOVE_TIMEOUT)
+    CONFIGS.GAME_TREE_GENERATION_TIMEOUT -= float(CONFIGS._GAME_TIMEOUT_SAFEZONE)
 
     CONFIGS.APP_ROLE = str(arguments.role)
 
