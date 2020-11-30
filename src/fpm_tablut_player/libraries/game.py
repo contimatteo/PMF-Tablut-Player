@@ -47,9 +47,9 @@ class Game():
         for currentRootNode in nodesToVisit:
             currentGameState = GameState().createfromGameNode(self.gameState, currentRootNode)
             # check the `max-depth` limit configutation.
-            # 
+            #
             # TODO: [@contimatteo] use a Timer to stop the search.
-            # 
+            #
             if currentRootNode.depth >= CONFIGS.K:
                 continue
             #
@@ -67,16 +67,13 @@ class Game():
         self.__generateSearchTree()
 
         # load the tree in the Heuristic class.
-        heuristic = RandomHeuristic().loadTree(self.searchTree)
+        # heuristic = RandomHeuristic().loadTree(self.searchTree)
 
-        #print("ECCOMI LAAAAAAAAAAAAAAAAAAAAAAAAAAAAa")
         # add heuristic values.
-        self.searchTree = heuristic.assignValues()
-        # print("ENDDDDDDDDDDDDDDDDDDDDD")
+        #self.searchTree = heuristic.assignValues()
 
         # algorithm
-        algorithm = MinMaxAlgorithm()
-        # algorithm = MontecarloAlgorithm()
+        algorithm = MinMaxAlgorithm("Random")
         # compute the game state that we want to reach.
         nodeToReach: GameNode = algorithm.getMorePromisingNode(self.searchTree)
 
