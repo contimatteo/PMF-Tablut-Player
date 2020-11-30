@@ -1,6 +1,6 @@
 import fpm_tablut_player.configs as CONFIGS
 
-from fpm_tablut_player.libraries.game_state import GameState
+from fpm_tablut_player.libraries.game_state import GameState, GameNode
 
 ###
 
@@ -18,6 +18,8 @@ class GameMove:
     toCell: str
     turn: str
 
+    ###
+
     def __init__(self):
         self.fromCell = None
         self.toCell = None
@@ -32,21 +34,14 @@ class GameMove:
 
         return "{}{}".format(str(COL_NAMES[y]), str(ROW_NAMES[x]))
 
-    def __getMoveForReachingState(self, start: GameState, end: GameState) -> (tuple, tuple):
-        #
-        # TODO: [@contimatteo] missing code.
-        # ...
-        # gameMove = start.getMoveForReaching(stateToReach: GameState) (board = .state)
-        #
-        fromCell = (3, 1)  # "d1"
-        toCell = (3, 2)  # "d2"
-        #
-        return (fromCell, toCell)
+    def __getMoveFromGameNode(self, gameNode: GameNode) -> ((int, int), (int, int)):
+        move = gameNode.moves[0]
+        return (move["from"], move["to"])
 
     ###
 
-    def fromStartToEnd(self, start: GameState, end: GameState):
-        (fromCell, toCell) = self.__getMoveForReachingState(start, end)
+    def fromGameNode(self, gameNode: GameNode):
+        (fromCell, toCell) = self.__getMoveFromGameNode(gameNode)
 
         # (int,int) --> str
         self.fromCell = self.__convertCellToServerFormat(fromCell[0], fromCell[1])

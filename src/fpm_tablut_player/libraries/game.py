@@ -1,12 +1,8 @@
-# import networkx as nx
-
+import fpm_tablut_player.configs as CONFIGS
 from fpm_tablut_player.algorithms import MinMaxAlgorithm
-from fpm_tablut_player.heuristics import RandomHeuristic
 from fpm_tablut_player.network import SocketManager as SocketManagerClass
 from fpm_tablut_player.libraries import GameState, GameMove, GameTree, GameNode
-from fpm_tablut_player.utils import DebugUtils, GameUtils
-
-import fpm_tablut_player.configs as CONFIGS
+from fpm_tablut_player.utils import DebugUtils, GameUtils, Timer
 
 
 ###
@@ -38,21 +34,23 @@ class Game():
         currentTurn = CONFIGS.APP_ROLE
         rootNode = GameNode().initialize(None, currentTurn, [], 0)
 
-        # create the tree
+        # create the tree.
         self.searchTree = GameTree().initialize(rootNode)
         # prepare the queue for visiting the nodes.
         nodesToVisit: [GameNode] = [rootNode]
 
+        # start the timer.
+        timer: Timer = Timer().start()
+
         #
         for currentRootNode in nodesToVisit:
+            # check if the time for generating the tree is not expired.
+            if timer.get_time_left(CONFIGS.GAME_TREE_GENERATION_TIMEOUT) <= 0:
+                timer.stop()
+                break
+            # create a {GameState} instance satrting from a {GameNode}.
             currentGameState = GameState().createfromGameNode(self.gameState, currentRootNode)
-            # check the `max-depth` limit configutation.
-            #
-            # TODO: [@contimatteo] use a Timer to stop the search.
-            #
-            if currentRootNode.depth >= CONFIGS.K:
-                continue
-            #
+            # try to the generate childrens of current node.
             for move in currentGameState.getPossibleMoves(currentRootNode.turn):
                 depth = currentRootNode.depth + 1
                 nextTurn = GameUtils.togglTurn(currentTurn)
@@ -68,22 +66,16 @@ class Game():
 
         # load the tree in the Heuristic class.
         # heuristic = RandomHeuristic().loadTree(self.searchTree)
-
         # add heuristic values.
-        #self.searchTree = heuristic.assignValues()
+        # self.searchTree = heuristic.assignValues()
 
         # algorithm
         algorithm = MinMaxAlgorithm("Random")
-        # compute the game state that we want to reach.
+        # extract the best node.
         nodeToReach: GameNode = algorithm.getMorePromisingNode(self.searchTree)
 
-        # convert the `nodeToReach` to a state
-        gameStateToReach = GameState().createfromGameNode(self.gameState, nodeToReach)
-
-        # comute the move for going from: {self.gameState} -> to: {gameStateToReach}.
-        next_move = GameMove().fromStartToEnd(self.gameState, gameStateToReach)
-        #
-        return next_move
+        # extract the move from the best node {nodeToReach}.
+        return GameMove().fromGameNode(nodeToReach)
 
     ###
 
@@ -115,6 +107,8 @@ class Game():
 
         # extract the "best" move for my player.
         next_move = self.__computeNextGameMove()
+        # convert this move to the server accepting format.
+        game_move_to_server_rappresentation = next_move.export()
 
         # send the move to the server.
-        self.SocketManager.send_json(next_move.export())
+        self.SocketManager.send_json(game_move_to_server_rappresentation)
