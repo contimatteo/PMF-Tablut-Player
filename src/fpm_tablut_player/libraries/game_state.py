@@ -1,6 +1,5 @@
 import numpy as np
 
-import fpm_tablut_player.configs as CONFIGS
 from fpm_tablut_player.libraries.game_node import GameNode
 from fpm_tablut_player.utils import GameUtils
 
@@ -20,20 +19,23 @@ class GameState:
         self.turn = GameUtils.turnToString(stateFromServer["turn"])
         board = stateFromServer["board"]
         #
-        # TODO: missing code.
+        # TODO: [@primiano] missing code.
         # ...
         #
         self.board = np.array(board)
+        #
+        return self
 
-    def createfromNode(self, initialGameState, node: GameNode):
-        # TODO: missing code.
+    def createfromGameNode(self, initialGameState, node: GameNode):
+        #
+        # TODO: [@primiano] missing code.
         # ...
         #
         return self
 
     def getPossibleMoves(self, turn: str) -> list:
         #
-        # TODO: missing code.
+        # TODO: [@primiano] missing code.
         # ...
         #
         return [

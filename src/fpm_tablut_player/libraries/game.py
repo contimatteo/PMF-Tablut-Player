@@ -45,8 +45,11 @@ class Game():
 
         #
         for currentRootNode in nodesToVisit:
-            currentGameState = GameState().createfromNode(self.gameState, currentRootNode)
+            currentGameState = GameState().createfromGameNode(self.gameState, currentRootNode)
             # check the `max-depth` limit configutation.
+            #
+            # TODO: [@contimatteo] use a Timer to stop the search.
+            #
             if currentRootNode.depth >= CONFIGS.K:
                 continue
             #
@@ -63,22 +66,19 @@ class Game():
     def __computeNextGameMove(self) -> GameMove:
         self.__generateSearchTree()
 
-        # heuristic
-        #heuristic = RandomHeuristic()
         # load the tree in the Heuristic class.
-        #heuristic.loadTree(self.searchTree)
+        # heuristic = RandomHeuristic().loadTree(self.searchTree)
 
         # add heuristic values.
         #self.searchTree = heuristic.assignValues()
 
         # algorithm
         algorithm = MinMaxAlgorithm("Random")
-        # algorithm = MontecarloAlgorithm()
         # compute the game state that we want to reach.
         nodeToReach: GameNode = algorithm.getMorePromisingNode(self.searchTree)
 
         # convert the `nodeToReach` to a state
-        gameStateToReach = GameState().createfromNode(self.gameState, nodeToReach)
+        gameStateToReach = GameState().createfromGameNode(self.gameState, nodeToReach)
 
         # comute the move for going from: {self.gameState} -> to: {gameStateToReach}.
         next_move = GameMove().fromStartToEnd(self.gameState, gameStateToReach)
@@ -93,6 +93,9 @@ class Game():
 
         DebugUtils.info("initial state = {}", [initial_state])
         DebugUtils.space()
+
+        # try to play (if I'm the white player ...).
+        self.play(initial_state)
 
         while not self.__is_finished():
             self.SocketManager.listen(self)
