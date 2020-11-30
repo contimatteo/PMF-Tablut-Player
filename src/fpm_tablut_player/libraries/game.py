@@ -64,17 +64,15 @@ class Game():
         self.__generateSearchTree()
 
         # heuristic
-        heuristic = RandomHeuristic()
+        #heuristic = RandomHeuristic()
         # load the tree in the Heuristic class.
-        heuristic.loadTree(self.searchTree)
+        #heuristic.loadTree(self.searchTree)
 
-        #print("ECCOMI LAAAAAAAAAAAAAAAAAAAAAAAAAAAAa")
         # add heuristic values.
-        self.searchTree = heuristic.assignValues()
-        # print("ENDDDDDDDDDDDDDDDDDDDDD")
+        #self.searchTree = heuristic.assignValues()
 
         # algorithm
-        algorithm = MinMaxAlgorithm()
+        algorithm = MinMaxAlgorithm("Random")
         # algorithm = MontecarloAlgorithm()
         # compute the game state that we want to reach.
         nodeToReach: GameNode = algorithm.getMorePromisingNode(self.searchTree)
