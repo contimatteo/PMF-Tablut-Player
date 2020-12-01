@@ -73,6 +73,24 @@ $ pip install .
 
 ```sh
 $ fpm_tablut_player
+
+    usage: fpm_tablut_player [-h] [--role {black,white}] [--timeout TIMEOUT] [--server SERVER]
+
+    optional arguments:
+    -h, --help            show this help message and exit
+    --role {black,white}  player role
+    --timeout TIMEOUT     move timeout
+    --server SERVER       server ip address
+```
+
+#### Examples
+Black Player
+```
+fpm_tablut_player --role 'black' --timeout 60 --server '127.0.0.1'
+```
+White Player
+```
+fpm_tablut_player --role 'white' --timeout 60 --server '127.0.0.1'
 ```
 
 <!-- ---------------------------------------------------------------------- -->
