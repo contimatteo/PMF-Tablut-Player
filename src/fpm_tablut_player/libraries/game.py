@@ -64,11 +64,6 @@ class Game():
     def __computeNextGameMove(self) -> GameMove:
         self.__generateSearchTree()
 
-        # load the tree in the Heuristic class.
-        # heuristic = RandomHeuristic().loadTree(self.searchTree)
-        # add heuristic values.
-        # self.searchTree = heuristic.assignValues()
-
         # algorithm
         algorithm = MinMaxAlgorithm("Random")
         # extract the best node.

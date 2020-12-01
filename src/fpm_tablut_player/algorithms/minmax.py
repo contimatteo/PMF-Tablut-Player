@@ -6,16 +6,16 @@ import networkx as nx
 
 
 class MinMaxAlgorithm():
-    max: str = "white" 
+    max: str = "white"
     min: str = "black"
     heuristic: Heuristic
 
     ###
 
-    def __init__(self,type_heuristic: str):
+    def __init__(self, type_heuristic: str):
         if type_heuristic == "Random":
             self.heuristic = RandomHeuristic()
-        else: #default heuristic
+        else:  # default heuristic
             self.heuristic = RandomHeuristic()
 
     def __elaborateNodeValues(self, tree_with_heuristics: GameTree, initialState: GameState):
@@ -38,8 +38,13 @@ class MinMaxAlgorithm():
                 children = GameTree.getChildren(tree_with_heuristics.graph, x, True)
                 if len(children) > 0:
                     L = L + children
+<<<<<<< HEAD
                 else: #foglia senza euristica
                     self.heuristic.assignValue(x, initialState)
+=======
+                else:  # foglia senza euristica
+                    self.heuristic.assignValue(x)
+>>>>>>> 91f3c994363a5d172a0dbad565132caa9c470ddf
 
     ###
 
@@ -53,9 +58,15 @@ class MinMaxAlgorithm():
         bestNode = None
         heuristicValue = None
 
-        DebugUtils.info("MinMaxAlogorithm",[])
+        # DebugUtils.info("MinMaxAlogorithm", [])
         for node in children:
-            #DebugUtils.info("       next possible move {} value {}", [str(node.moves),node.heuristic])
+<<<<<<< HEAD
+            # DebugUtils.info("       next possible move {} value {}",
+            #                 [str(node.moves), node.heuristic])
+=======
+            # DebugUtils.info("       next possible move {} value {}",
+            #                 [str(node.moves), node.heuristic])
+>>>>>>> 91f3c994363a5d172a0dbad565132caa9c470ddf
             if heuristicValue is None:
                 heuristicValue = node.heuristic
                 bestNode = node
@@ -66,8 +77,8 @@ class MinMaxAlgorithm():
                 heuristicValue = node.heuristic
                 bestNode = node
 
-        DebugUtils.info("       Best move is {}", [str(bestNode.moves)])
-        DebugUtils.space()
+        # DebugUtils.info("       Best move is {}", [str(bestNode.moves)])
+        # DebugUtils.space()
 
         return bestNode
 
