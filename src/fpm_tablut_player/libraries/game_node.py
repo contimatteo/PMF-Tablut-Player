@@ -17,6 +17,7 @@ class GameNode():
         self.moves = []
         self.turn = None
         self.parent = None
+        self.debugIndex = 0
         self.heuristic = None
 
     def initialize(self, parentNode, turn: str, moves: list, depth: int = 0):
