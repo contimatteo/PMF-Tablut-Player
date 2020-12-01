@@ -43,8 +43,6 @@ class GameMultithread():
         thread_index = threadParams[0]
         nodes_generated_counter = 0
 
-        print(" >> [{}] >> (TreeGeneration) STARTING ".format(thread_index))
-        
         # create the root node
         rootNode = GameNode().initialize(None, currentTurn, [], 0)
 
@@ -56,17 +54,20 @@ class GameMultithread():
         # start the timer.
         timer: Timer = Timer().start()
 
-        # start visiting the tree with a BFS search. 
-        # for currentRootNode in nodesToVisit:
+        # start visiting the tree with a BFS search.
         while nodesToVisit:
             currentRootNode = nodesToVisit.pop(0)
             # check if the time for generating the tree is not expired.
             time_left = timer.get_time_left(CONFIGS.GAME_TREE_GENERATION_TIMEOUT)
             if time_left <= 0:
-                print(" >> [{}] >> (time) depth reached = {}".format(thread_index, currentRootNode.depth))
+                DebugUtils.info("[{}] >> (TreeGeneration) timeout emitted", [thread_index])
+                DebugUtils.info("[{}] >> (TreeGeneration) depth = {}", [
+                                thread_index, currentRootNode.depth])
                 break
             if currentRootNode.depth > int(CONFIGS._GAME_TREE_MAX_DEPTH):
-                print(" >> [{}] >> (depth) depth reached = {}".format(thread_index, currentRootNode.depth))
+                DebugUtils.info("[{}] >> (TreeGeneration) max-depth", [thread_index])
+                DebugUtils.info("[{}] >> (TreeGeneration) depth = {}", [
+                                thread_index, currentRootNode.depth])
                 break
             #
             # create a {GameState} instance satrting from a {GameNode}.
@@ -90,9 +91,11 @@ class GameMultithread():
                 #
                 nodesToVisit.append(newNode)
                 self.searchTree[thread_index].addNode([newNode])
-        
-        print(" >> [{}] >> (TreeGeneration) ENDING ({}) = {}".format(thread_index, timer.get_elapsed_time(), nodes_generated_counter))
-
+        #
+        DebugUtils.info("[{}] >> (TreeGeneration) ended in {} seconds",
+                        [thread_index, timer.get_elapsed_time()])
+        DebugUtils.info("[{}] >> (TreeGeneration) number of generated nodes = {}",
+                        [thread_index, nodes_generated_counter])
         # stop the timer.
         timer.stop()
 
@@ -102,17 +105,18 @@ class GameMultithread():
         # generate the search tree.
         self.__generateSearchTree(threadParams)
 
+        # start the timer.
         timer = Timer().start()
-
-        print(" >> [{}] >> (MinMaxAlgorithm) STARTING".format(thread_index))
-
         # algorithm
         algorithm = MinMaxAlgorithm("Random")
+
         # extract the best node.
         nodeToReach: GameNode = algorithm.getMorePromisingNode(self.searchTree[thread_index])
-
-        print(" >> [{}] >> (MinMaxAlgorithm) ENDING ({})".format(thread_index, timer.get_elapsed_time()))
-
+        
+        #
+        DebugUtils.info("[{}] >> (MinMaxAlgorithm) ended in {} seconds",
+                        [thread_index, timer.get_elapsed_time()])
+        # stop the timer.
         timer.stop()
 
         return nodeToReach
@@ -146,15 +150,14 @@ class GameMultithread():
         self.__loadGameState(stateFromServer)
 
         # extract the "best" move for my player.
-        # next_move = self.__computeNextGameMove()
-        next_move = self.multithread()
+        next_move = self.__multithread()
 
         # convert this move to the server accepting format.
         game_move_to_server_rappresentation = next_move.export()
         # send the move to the server.
         self.SocketManager.send_json(game_move_to_server_rappresentation)
 
-    def multithread(self) -> GameMove:
+    def __multithread(self) -> GameMove:
         # Make the Pool of workers
         pool = ThreadPool(THREADS_COUNT)
 
