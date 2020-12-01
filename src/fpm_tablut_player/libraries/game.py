@@ -59,7 +59,7 @@ class Game():
                 newNode = GameNode().initialize(currentRootNode, nextTurn, movesToSave, depth)
                 #
                 nodesToVisit.append(newNode)
-                self.searchTree.addNode([newNode])
+                self.searchTree.addNode(currentRootNode,[newNode])
 
     def __computeNextGameMove(self) -> GameMove:
         self.__generateSearchTree()

@@ -22,9 +22,9 @@ class GameTree():
         self.root = rootNode
         return self
 
-    def addNode(self, nodes: [GameNode]):
+    def addNode(self, parent: GameNode,nodes: [GameNode]):
         for node in nodes:
-            self.graph.add_edge(self.root, node, weight=0)
+            self.graph.add_edge(parent, node, weight=0)
 
     def bfs(self, withRootNode: bool = False) -> [GameNode]:
         root = self.root

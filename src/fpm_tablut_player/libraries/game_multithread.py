@@ -90,7 +90,7 @@ class GameMultithread():
                 newNode = GameNode().initialize(currentRootNode, nextTurn, movesToSave, depth)
                 #
                 nodesToVisit.append(newNode)
-                self.searchTree[thread_index].addNode([newNode])
+                self.searchTree[thread_index].addNode(currentRootNode,[newNode])
         #
         DebugUtils.info("[{}] >> (TreeGeneration) ended in {} seconds",
                         [thread_index, timer.get_elapsed_time()])
@@ -111,11 +111,12 @@ class GameMultithread():
         algorithm = MinMaxAlgorithm("Random")
 
         # extract the best node.
-        nodeToReach: GameNode = algorithm.getMorePromisingNode(self.searchTree[thread_index])
+        nodeToReach: GameNode = algorithm.getMorePromisingNode(self.searchTree[thread_index],self.gameState)
         
         #
         DebugUtils.info("[{}] >> (MinMaxAlgorithm) ended in {} seconds",
                         [thread_index, timer.get_elapsed_time()])
+        #DebugUtils.info("       BEST MOVE {}",[nodeToReach.moves])
         # stop the timer.
         timer.stop()
 
