@@ -4,7 +4,7 @@ import sys
 import argparse
 
 import fpm_tablut_player.configs as CONFIGS
-from fpm_tablut_player.libraries import Game
+from fpm_tablut_player.libraries import GameMultithread as Game
 from fpm_tablut_player.utils import DebugUtils
 
 
@@ -44,14 +44,14 @@ def __parse_args():
         CONFIGS.SERVER_HOST = str(arguments.server)
     if arguments.timeout:
         timeout = float(arguments.timeout)
-        threshold = float(CONFIGS._GAME_TIMEOUT_SAFEZONE)
-        if timeout > 10 and timeout > threshold:
-            CONFIGS.GAME_MOVE_TIMEOUT = timeout - 10
+        if timeout >= 10:
+            CONFIGS.GAME_MOVE_TIMEOUT = timeout
         else:
-            raise Exception("Timeout argument must be at least {:}".format(threshold))
+            raise Exception("Timeout argument must be at least {:} seconds".format(10))
 
-    CONFIGS.GAME_TREE_GENERATION_TIMEOUT = float(CONFIGS.GAME_MOVE_TIMEOUT)
-    CONFIGS.GAME_TREE_GENERATION_TIMEOUT -= float(CONFIGS._GAME_TIMEOUT_SAFEZONE)
+    computationTimeNotAvailablePercentage = float(CONFIGS._APP_COMPUTATION_TIME_NEEDED_PERCENTAGE)
+    CONFIGS.GAME_TREE_GENERATION_TIMEOUT = 1 - computationTimeNotAvailablePercentage
+    CONFIGS.GAME_TREE_GENERATION_TIMEOUT *= float(CONFIGS.GAME_MOVE_TIMEOUT)
 
     CONFIGS.APP_ROLE = str(arguments.role)
 

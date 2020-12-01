@@ -6,16 +6,16 @@ from fpm_tablut_player.heuristics import Heuristic, RandomHeuristic
 
 
 class MinMaxAlgorithm():
-    max: str = "white" 
+    max: str = "white"
     min: str = "black"
     heuristic: Heuristic
 
     ###
 
-    def __init__(self,type_heuristic: str):
+    def __init__(self, type_heuristic: str):
         if type_heuristic == "Random":
             self.heuristic = RandomHeuristic()
-        else: #default heuristic
+        else:  # default heuristic
             self.heuristic = RandomHeuristic()
 
     def __elaborateNodeValues(self, tree_with_heuristics: GameTree):
@@ -38,7 +38,7 @@ class MinMaxAlgorithm():
                 children = GameTree.getChildren(tree_with_heuristics.graph, x, True)
                 if len(children) > 0:
                     L = L + children
-                else: #foglia senza euristica
+                else:  # foglia senza euristica
                     self.heuristic.assignValue(x)
 
     ###
@@ -52,9 +52,10 @@ class MinMaxAlgorithm():
         bestNode = None
         heuristicValue = None
 
-        DebugUtils.info("MinMaxAlogorithm",[])
+        # DebugUtils.info("MinMaxAlogorithm", [])
         for node in children:
-            DebugUtils.info("       next possible move {} value {}", [str(node.moves),node.heuristic])
+            # DebugUtils.info("       next possible move {} value {}",
+            #                 [str(node.moves), node.heuristic])
             if heuristicValue is None:
                 heuristicValue = node.heuristic
                 bestNode = node
@@ -65,7 +66,7 @@ class MinMaxAlgorithm():
                 heuristicValue = node.heuristic
                 bestNode = node
 
-        DebugUtils.info("       Best move is {}", [str(bestNode.moves)])
-        DebugUtils.space()
+        # DebugUtils.info("       Best move is {}", [str(bestNode.moves)])
+        # DebugUtils.space()
 
         return bestNode
