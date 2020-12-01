@@ -21,19 +21,19 @@ class AlphaBetaCutAlgorithm():
         #Log=[0]
         while len(L)>0:
             x=L[-1]
-
+        
             if x == node and x.heuristic is not None:
-                #print("last node I have finished")
+                #DebugUtils.info("last node I have finished",[])
                 L.pop()
                 #Log.pop()
             elif x.heuristic is not None:
-                #print("current node has a value")
+                #DebugUtils.info("current node has a value",[])
                 alpha=None
                 beta =None
 
 
                 if x.parent.turn == self.min: # parent is min node
-                    #print("     parent is a min node")
+                    #DebugUtils.info("     parent is a min node => status",[])
                     beta = x.parent.heuristic
 
                     if (beta is None) or (x.heuristic < beta):
@@ -44,24 +44,21 @@ class AlphaBetaCutAlgorithm():
                     if x.parent.parent is not None:
                         alpha = x.parent.parent.heuristic
 
-                    #print("     alpha: ",alpha," beta: ",beta)
-
+                    #DebugUtils.info("     alpha: {} beta: {}",[alpha,beta])
+                    x.parent.heuristic = beta
                     if alpha is None:
-                        x.parent.heuristic = beta  
-                        L.pop()
-                        #Log.pop()
                         x.parent.numberChildren = x.parent.numberChildren -1
                     elif alpha >= beta:
-                        #print("parent is min => cancello a partire da ",(x.debugIndex+1))
+                        #DebugUtils.info("parent is min => cancello a partire da {}",[(x.debugIndex+1)])
                         while x.parent.numberChildren > 0 :#remove all x.parent children
                             L.pop()
                             #Log.pop()
                             x.parent.numberChildren = x.parent.numberChildren -1
-                        L.pop() #remove x.parent
-                        #Log.pop()
+                    L.pop()
+                    #Log.pop()
                 ##################################################################  
                 else: # parent is a max node
-                    #print("     parent is a max node")
+                    #DebugUtils.info("     parent is a max node",[])
                     alpha = x.parent.heuristic
 
                     if (alpha is None) or (x.heuristic > alpha):
@@ -72,24 +69,22 @@ class AlphaBetaCutAlgorithm():
                     if x.parent.parent is not None:
                         beta = x.parent.parent.heuristic
 
-                    #print("     alpha: ",alpha," beta: ",beta)
+                    #DebugUtils.info("     alpha: {} beta: {}",[alpha,beta])
+                    x.parent.heuristic = alpha
                     if beta is None:
                         x.parent.heuristic = alpha  
-                        L.pop()
-                        #Log.pop()
                         x.parent.numberChildren = x.parent.numberChildren -1
                     elif alpha >= beta:
-                        #print("parent is max => cancello a partire da ",x.heuristic)
+                        #DebugUtils.info("parent is max => cancello a partire da {}",[x.debugIndex])
                         while x.parent.numberChildren > 0 :#remove all x.parent children
                             L.pop()
-                            #Log.pop()
                             x.parent.numberChildren = x.parent.numberChildren -1
-                        L.pop() #remove x.parent
-                        #Log.pop()
+                    L.pop()
+                    #Log.pop()
 
             ##################################################################
             else:
-                #print("non terminal node => adding children")
+                #DebugUtils.info("non terminal node => adding children",[])
                 children=GameTree.getChildren(tree_with_heuristics.graph,x,True)
                 x.numberChildren=len(children)
 
@@ -100,16 +95,21 @@ class AlphaBetaCutAlgorithm():
                 else: #leaf without heurisitc
                     self.heuristic.assignValue(x, initialState)
                     
-    def getMorePromisingState(self, tree_with_heuristics: GameTree, initialState: GameState) -> GameNode:
-        self.__elaborateNodeValues(tree_with_heuristics, initialState)
-
+    def getMorePromisingNode(self, tree_with_heuristics: GameTree, initialState: GameState) -> GameNode:
         root = tree_with_heuristics.root
         children = GameTree.getChildren(tree_with_heuristics.graph,root,False)
+
+        if len(children) == 0:
+            return None
+
+        DebugUtils.info("AlphaBetaCutAlogorithm", [])
+        self.__elaborateNodeValues(tree_with_heuristics, initialState)
 
         heuristicValue = None
         bestNode = None
 
         for node in children:
+            DebugUtils.info("       next possible move {} value {}",[str(node.moves), node.heuristic])
             if node.heuristic is not None:
                 if heuristicValue == None :
                     heuristicValue = node.heuristic

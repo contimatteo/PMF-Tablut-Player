@@ -1,5 +1,5 @@
 import fpm_tablut_player.configs as CONFIGS
-from fpm_tablut_player.algorithms import MinMaxAlgorithm
+from fpm_tablut_player.algorithms import MinMaxAlgorithm, AlphaBetaCutAlgorithm
 from fpm_tablut_player.network import SocketManager as SocketManagerClass
 from fpm_tablut_player.libraries import GameState, GameMove, GameTree, GameNode
 from fpm_tablut_player.utils import DebugUtils, GameUtils, Timer
@@ -65,7 +65,8 @@ class Game():
         self.__generateSearchTree()
 
         # algorithm
-        algorithm = MinMaxAlgorithm("Random")
+        #algorithm = MinMaxAlgorithm("Random")
+        algorithm = AlphaBetaCutAlgorithm("Random")
         # extract the best node.
         nodeToReach: GameNode = algorithm.getMorePromisingNode(self.searchTree,self.gameState)
 

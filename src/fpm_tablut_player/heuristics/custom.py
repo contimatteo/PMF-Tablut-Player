@@ -40,6 +40,8 @@ class CustomHeuristic(Heuristic):
     #def blackPawnNearTheKing(self):
     #def getNumberOfKills(self) ->int:
 
+    #def computeForBlack(self, node: GameNode, initialState: GameState):
+    #def computeForWhite(self, node: GameNode, initialState: GameState):
 
     def assignValue(self, node: GameNode, initialState: GameState):
         self.state=GameState().createfromGameNode(initialState, node)

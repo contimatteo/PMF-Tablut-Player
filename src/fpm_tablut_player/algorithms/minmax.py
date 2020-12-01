@@ -48,15 +48,17 @@ class MinMaxAlgorithm():
         root = tree_with_heuristics.root
         children = GameTree.getChildren(tree_with_heuristics.graph, root, False)
 
+        if len(children) == 0:
+            return None
+            
         self.__elaborateNodeValues(tree_with_heuristics, initialState)
 
         bestNode = None
         heuristicValue = None
         #DebugUtils.info(" This root has {} children",[len(children)])
-        # DebugUtils.info("MinMaxAlogorithm", [])
+        DebugUtils.info("MinMaxAlogorithm", [])
         for node in children:
-            # DebugUtils.info("       next possible move {} value {}",
-            #                 [str(node.moves), node.heuristic])
+            DebugUtils.info("       next possible move {} value {}",[str(node.moves), node.heuristic])
             if heuristicValue is None:
                 heuristicValue = node.heuristic
                 bestNode = node

@@ -2,7 +2,7 @@ import numpy as np
 from multiprocessing.dummy import Pool as ThreadPool
 
 import fpm_tablut_player.configs as CONFIGS
-from fpm_tablut_player.algorithms import MinMaxAlgorithm
+from fpm_tablut_player.algorithms import MinMaxAlgorithm, AlphaBetaCutAlgorithm
 from fpm_tablut_player.network import SocketManager as SocketManagerClass
 from fpm_tablut_player.libraries import GameState, GameMove, GameTree, GameNode
 from fpm_tablut_player.utils import DebugUtils, GameUtils, Timer
@@ -57,6 +57,7 @@ class GameMultithread():
         # start visiting the tree with a BFS search.
         while nodesToVisit:
             currentRootNode = nodesToVisit.pop(0)
+            currentRootNode.debugIndex=0
             # check if the time for generating the tree is not expired.
             time_left = timer.get_time_left(CONFIGS.GAME_TREE_GENERATION_TIMEOUT)
             if time_left <= 0:
@@ -80,6 +81,7 @@ class GameMultithread():
                 moves = np.array_split(moves, THREADS_COUNT)[thread_index]
             #
             # try to the generate childrens of current node.
+
             for move in moves:
                 nodes_generated_counter += 1
                 #
@@ -91,6 +93,7 @@ class GameMultithread():
                 #
                 nodesToVisit.append(newNode)
                 self.searchTree[thread_index].addNode(currentRootNode,[newNode])
+
         #
         DebugUtils.info("[{}] >> (TreeGeneration) ended in {} seconds",
                         [thread_index, timer.get_elapsed_time()])
@@ -108,13 +111,14 @@ class GameMultithread():
         # start the timer.
         timer = Timer().start()
         # algorithm
-        algorithm = MinMaxAlgorithm("Random")
+        #algorithm = MinMaxAlgorithm("Random")
+        algorithm = AlphaBetaCutAlgorithm("Random")
 
         # extract the best node.
         nodeToReach: GameNode = algorithm.getMorePromisingNode(self.searchTree[thread_index],self.gameState)
         
         #
-        DebugUtils.info("[{}] >> (MinMaxAlgorithm) ended in {} seconds",
+        DebugUtils.info("[{}] >> (AlphaBetaCutAlgorithm) ended in {} seconds",
                         [thread_index, timer.get_elapsed_time()])
         #DebugUtils.info("       BEST MOVE {}",[nodeToReach.moves])
         # stop the timer.
