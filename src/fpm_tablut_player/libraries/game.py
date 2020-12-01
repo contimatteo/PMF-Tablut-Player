@@ -72,7 +72,7 @@ class Game():
         # algorithm
         algorithm = MinMaxAlgorithm("Random")
         # extract the best node.
-        nodeToReach: GameNode = algorithm.getMorePromisingNode(self.searchTree)
+        nodeToReach: GameNode = algorithm.getMorePromisingNode(self.searchTree,self.gameState)
 
         # extract the move from the best node {nodeToReach}.
         return GameMove().fromGameNode(nodeToReach)

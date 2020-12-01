@@ -1,4 +1,4 @@
-from fpm_tablut_player.libraries import GameTree, GameNode;
+from fpm_tablut_player.libraries import GameTree, GameNode, GameState;
 from fpm_tablut_player.utils import DebugUtils
 from fpm_tablut_player.heuristics import Heuristic, RandomHeuristic
 #import networkx as nx
@@ -15,7 +15,7 @@ class AlphaBetaCutAlgorithm():
         else: #default heuristic
             self.heuristic = RandomHeuristic()
 
-    def __elaborateNodeValues(self,tree_with_heuristics: GameTree):
+    def __elaborateNodeValues(self,tree_with_heuristics: GameTree, initialState: GameState):
         node = tree_with_heuristics.root
         L=[node]
         #Log=[0]
@@ -98,10 +98,10 @@ class AlphaBetaCutAlgorithm():
                     #for child in children:
                     #    Log=Log +[child.debugIndex]
                 else: #leaf without heurisitc
-                    self.heuristic.assignValue(x)
+                    self.heuristic.assignValue(x, initialState)
                     
-    def getMorePromisingState(self, tree_with_heuristics: GameTree) -> GameNode:
-        self.__elaborateNodeValues(tree_with_heuristics)
+    def getMorePromisingState(self, tree_with_heuristics: GameTree, initialState: GameState) -> GameNode:
+        self.__elaborateNodeValues(tree_with_heuristics, initialState)
 
         root = tree_with_heuristics.root
         children = GameTree.getChildren(tree_with_heuristics.graph,root,False)
