@@ -38,13 +38,8 @@ class MinMaxAlgorithm():
                 children = GameTree.getChildren(tree_with_heuristics.graph, x, True)
                 if len(children) > 0:
                     L = L + children
-<<<<<<< HEAD
                 else: #foglia senza euristica
                     self.heuristic.assignValue(x, initialState)
-=======
-                else:  # foglia senza euristica
-                    self.heuristic.assignValue(x)
->>>>>>> 91f3c994363a5d172a0dbad565132caa9c470ddf
 
     ###
 
@@ -60,13 +55,8 @@ class MinMaxAlgorithm():
 
         # DebugUtils.info("MinMaxAlogorithm", [])
         for node in children:
-<<<<<<< HEAD
             # DebugUtils.info("       next possible move {} value {}",
             #                 [str(node.moves), node.heuristic])
-=======
-            # DebugUtils.info("       next possible move {} value {}",
-            #                 [str(node.moves), node.heuristic])
->>>>>>> 91f3c994363a5d172a0dbad565132caa9c470ddf
             if heuristicValue is None:
                 heuristicValue = node.heuristic
                 bestNode = node
