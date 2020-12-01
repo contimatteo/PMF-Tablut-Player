@@ -44,12 +44,14 @@ class GameTree():
 
     @staticmethod
     def getChildren(graph: nx.DiGraph, node: GameNode, inverse: bool = False) -> [GameNode]:
-        #edges = list(nx.bfs_edges(graph, node))
-        edges = list(graph.edges(node))
-        if inverse:
-            L = []
-            for u, v in edges:
-                L = [v]+L
-            return L
-
-        return [v for u, v in edges]
+        try:
+            edges = list(graph.edges(node))
+            if inverse:
+                L = []
+                for _, v in edges:
+                    L = [v]+L
+                return L
+            #
+            return [v for u, v in edges]
+        except Exception as _:
+            return []
