@@ -22,9 +22,9 @@ class GameTree():
         self.root = rootNode
         return self
 
-    def addNode(self, nodes: [GameNode]):
+    def addNode(self, parent: GameNode, nodes: [GameNode]):
         for node in nodes:
-            self.graph.add_edge(self.root, node, weight=0)
+            self.graph.add_edge(parent, node, weight=0)
 
     def bfs(self, withRootNode: bool = False) -> [GameNode]:
         root = self.root
@@ -44,11 +44,14 @@ class GameTree():
 
     @staticmethod
     def getChildren(graph: nx.DiGraph, node: GameNode, inverse: bool = False) -> [GameNode]:
-        edges = list(nx.bfs_edges(graph, node))
-        if inverse:
-            L = []
-            for u, v in edges:
-                L = [v]+L
-            return L
-
-        return [v for u, v in edges]
+        try:
+            edges = list(graph.edges(node))
+            if inverse:
+                L = []
+                for _, v in edges:
+                    L = [v]+L
+                return L
+            #
+            return [v for u, v in edges]
+        except Exception as _:
+            return []
