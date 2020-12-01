@@ -1,8 +1,8 @@
-import numpy as np
 from multiprocessing.dummy import Pool as ThreadPool
+import numpy as np
 
 import fpm_tablut_player.configs as CONFIGS
-from fpm_tablut_player.algorithms import MinMaxAlgorithm
+from fpm_tablut_player.algorithms import MinMaxAlgorithm, AlphaBetaCutAlgorithm
 from fpm_tablut_player.network import SocketManager as SocketManagerClass
 from fpm_tablut_player.libraries import GameState, GameMove, GameTree, GameNode
 from fpm_tablut_player.utils import DebugUtils, GameUtils, Timer
@@ -62,12 +62,12 @@ class GameMultithread():
             if time_left <= 0:
                 DebugUtils.info("[{}] >> (TreeGeneration) timeout emitted", [thread_index])
                 DebugUtils.info("[{}] >> (TreeGeneration) depth = {}", [
-                                thread_index, currentRootNode.depth])
+                    thread_index, currentRootNode.depth])
                 break
             if currentRootNode.depth > int(CONFIGS._GAME_TREE_MAX_DEPTH):
                 DebugUtils.info("[{}] >> (TreeGeneration) max-depth", [thread_index])
                 DebugUtils.info("[{}] >> (TreeGeneration) depth = {}", [
-                                thread_index, currentRootNode.depth])
+                    thread_index, currentRootNode.depth])
                 break
             #
             # create a {GameState} instance satrting from a {GameNode}.
@@ -90,7 +90,8 @@ class GameMultithread():
                 newNode = GameNode().initialize(currentRootNode, nextTurn, movesToSave, depth)
                 #
                 nodesToVisit.append(newNode)
-                self.searchTree[thread_index].addNode([newNode])
+                self.searchTree[thread_index].addNode(currentRootNode, [newNode])
+
         #
         DebugUtils.info("[{}] >> (TreeGeneration) ended in {} seconds",
                         [thread_index, timer.get_elapsed_time()])
@@ -108,14 +109,17 @@ class GameMultithread():
         # start the timer.
         timer = Timer().start()
         # algorithm
-        algorithm = MinMaxAlgorithm("Random")
+        #algorithm = MinMaxAlgorithm("Random")
+        algorithm = AlphaBetaCutAlgorithm("Random")
 
         # extract the best node.
-        nodeToReach: GameNode = algorithm.getMorePromisingNode(self.searchTree[thread_index])
+        nodeToReach: GameNode = algorithm.getMorePromisingNode(
+            self.searchTree[thread_index], self.gameState)
 
         #
-        DebugUtils.info("[{}] >> (MinMaxAlgorithm) ended in {} seconds",
+        DebugUtils.info("[{}] >> (AlphaBetaCutAlgorithm) ended in {} seconds",
                         [thread_index, timer.get_elapsed_time()])
+        #DebugUtils.info("       BEST MOVE {}",[nodeToReach.moves])
         # stop the timer.
         timer.stop()
 

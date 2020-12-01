@@ -1,9 +1,9 @@
-from fpm_tablut_player.libraries import GameNode
+from fpm_tablut_player.libraries import GameNode, GameState
 
 
 ###
 
 
 class Heuristic():
-    def assignValue(self, Node: GameNode):
+    def assignValue(self, node: GameNode, initialState: GameState):
         pass
