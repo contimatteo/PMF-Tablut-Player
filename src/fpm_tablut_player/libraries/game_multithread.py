@@ -38,7 +38,7 @@ class GameMultithread():
     def __is_my_turn(self) -> bool:
         return str(self.turn) == str(CONFIGS.APP_ROLE)
 
-    def __generateSearchTree(self, threadParams: tuple) -> GameTree:
+    def __generateSearchTreeInParallel(self, threadParams: tuple) -> GameTree:
         currentTurn = CONFIGS.APP_ROLE
         thread_index = threadParams[0]
         nodes_generated_counter = 0
@@ -103,7 +103,7 @@ class GameMultithread():
         thread_index = threadParams[0]
 
         # generate the search tree.
-        self.__generateSearchTree(threadParams)
+        self.__generateSearchTreeInParallel(threadParams)
 
         # start the timer.
         timer = Timer().start()
@@ -112,7 +112,7 @@ class GameMultithread():
 
         # extract the best node.
         nodeToReach: GameNode = algorithm.getMorePromisingNode(self.searchTree[thread_index])
-        
+
         #
         DebugUtils.info("[{}] >> (MinMaxAlgorithm) ended in {} seconds",
                         [thread_index, timer.get_elapsed_time()])
@@ -120,6 +120,37 @@ class GameMultithread():
         timer.stop()
 
         return nodeToReach
+
+    def __multithreadSearchOfBestMove(self) -> GameMove:
+        # params
+        thread_indexes = np.linspace(0, THREADS_COUNT-1, THREADS_COUNT, dtype=np.int).tolist()
+        thread_params = zip(thread_indexes)
+
+        # #################################################################### #
+        # ###################### Start Multithread Mode ###################### #
+
+        # Make the Pool of workers
+        pool = ThreadPool(THREADS_COUNT)
+
+        # start the multiprocessing workers ...
+        bestNodesToReach = pool.map(self.__computeNextGameMoveInParallel, thread_params)
+        bestNodesToReach: [GameNode] = [node for node in bestNodesToReach if node is not None]
+
+        # Close the pool and wait for the thread to finish.
+        pool.close()
+        pool.join()
+
+        # ####################### End Multithread Mode ####################### #
+        # #################################################################### #
+
+        # find the best node inside the {bestNodesToReach} list.
+        bestNodeToReach: GameNode = bestNodesToReach[0]
+        for nodeToReach in bestNodesToReach:
+            if nodeToReach.heuristic > bestNodeToReach.heuristic:
+                bestNodeToReach = nodeToReach
+
+        # extract the move from the best node {nodeToReach}.
+        return GameMove().fromGameNode(bestNodeToReach)
 
     ###
 
@@ -150,33 +181,9 @@ class GameMultithread():
         self.__loadGameState(stateFromServer)
 
         # extract the "best" move for my player.
-        next_move = self.__multithread()
+        next_move = self.__multithreadSearchOfBestMove()
 
         # convert this move to the server accepting format.
         game_move_to_server_rappresentation = next_move.export()
         # send the move to the server.
         self.SocketManager.send_json(game_move_to_server_rappresentation)
-
-    def __multithread(self) -> GameMove:
-        # Make the Pool of workers
-        pool = ThreadPool(THREADS_COUNT)
-
-        # params
-        thread_indexes = np.linspace(0, THREADS_COUNT-1, THREADS_COUNT, dtype=np.int).tolist()
-
-        # start the multiprocessing workers ...
-        bestNodesToReach = pool.map(self.__computeNextGameMoveInParallel, zip(thread_indexes))
-        bestNodesToReach: [GameNode] = [node for node in bestNodesToReach if node is not None]
-
-        # Close the pool and wait for the work to finish
-        pool.close()
-        pool.join()
-
-        # find the best node inside the {bestNodesToReach} list.
-        bestNodeToReach: GameNode = bestNodesToReach[0]
-        for nodeToReach in bestNodesToReach:
-            if nodeToReach.heuristic > bestNodeToReach.heuristic:
-                bestNodeToReach = nodeToReach
-
-        # extract the move from the best node {nodeToReach}.
-        return GameMove().fromGameNode(bestNodeToReach)
