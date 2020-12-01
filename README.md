@@ -13,7 +13,6 @@
   - [Usage](#client-usage)
 - [Server](#server)
   - [Prerequisites](#server-prerequisites)
-  - [Installation](#server-installation)
   - [Usage](#server-usage)
 - [Authors](#authors)
 - [Contributions](#contributions)
@@ -74,23 +73,27 @@ $ pip install .
 ```sh
 $ fpm_tablut_player
 
-    usage: fpm_tablut_player [-h] [--role {black,white}] [--timeout TIMEOUT] [--server SERVER]
+  usage: fpm_tablut_player [-h] [--role {black,white}] [--timeout TIMEOUT] [--server SERVER]
 
-    optional arguments:
-    -h, --help            show this help message and exit
-    --role {black,white}  player role
-    --timeout TIMEOUT     move timeout
-    --server SERVER       server ip address
+  optional arguments:
+  -h, --help            show this help message and exit
+  --role {black,white}  player role
+  --timeout TIMEOUT     move timeout
+  --server SERVER       server ip address
 ```
 
 #### Examples
+
 Black Player
+
+```sh
+$ fpm_tablut_player --role 'black' --timeout 60 --server '127.0.0.1'
 ```
-fpm_tablut_player --role 'black' --timeout 60 --server '127.0.0.1'
-```
+
 White Player
-```
-fpm_tablut_player --role 'white' --timeout 60 --server '127.0.0.1'
+
+```sh
+$ fpm_tablut_player --role 'white' --timeout 60 --server '127.0.0.1'
 ```
 
 <!-- ---------------------------------------------------------------------- -->
@@ -105,31 +108,18 @@ $ git submodule update --init --recursive --remote
 $ cd server/Tablut
 ```
 
-Next, follow the instructions insde the [README.md](https://github.com/AGalassi/TablutCompetition/blob/master/README.md).
-
-### Server Installation
-
-```sh
-$ ant clean
-$ ant compile
-```
-
 ### Server Usage
 
-```sh
-$ ant server
-```
+Follow the instructions insde the [README.md](https://github.com/AGalassi/TablutCompetition/blob/master/README.md) file.
 
 <!-- ---------------------------------------------------------------------- -->
 <!-- ---------------------------------------------------------------------- -->
 
 ## Authors
 
-...
-
-## Contributions
-
-...
+ - [Matteo Conti](https://github.com/contimatteo)
+ - [Francesco Palmisano](https://github.com/Frankgamer97)
+ - [Primiano Armino Cristino](https://github.com/primiarmi)
 
 ## License
 
