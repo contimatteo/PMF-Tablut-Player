@@ -111,8 +111,8 @@ class GameMultithread():
         # start the timer.
         timer = Timer().start()
         # algorithm
-        #algorithm = MinMaxAlgorithm("Random")
-        algorithm = AlphaBetaCutAlgorithm("Random")
+        # algorithm = MinMaxAlgorithm()
+        algorithm = AlphaBetaCutAlgorithm()
 
         # extract the best node.
         nodeToReach: GameNode = algorithm.getMorePromisingNode(
@@ -121,7 +121,7 @@ class GameMultithread():
         #
         DebugUtils.info("[{}] >> (AlphaBetaCutAlgorithm) ended in {} seconds",
                         [thread_index, timer.get_elapsed_time()])
-        #DebugUtils.info("       BEST MOVE {}",[nodeToReach.moves])
+        # DebugUtils.info("       BEST MOVE {}",[nodeToReach.moves])
         # stop the timer.
         timer.stop()
 
@@ -151,9 +151,13 @@ class GameMultithread():
 
         # find the best node inside the {bestNodesToReach} list.
         bestNodeToReach: GameNode = bestNodesToReach[0]
-        for nodeToReach in bestNodesToReach:
-            if nodeToReach.heuristic > bestNodeToReach.heuristic:
-                bestNodeToReach = nodeToReach
+        for currentNode in bestNodesToReach:
+            if self.turn == "white":
+                if currentNode.heuristic > bestNodeToReach.heuristic:
+                    bestNodeToReach = currentNode
+            else:
+                if currentNode.heuristic < bestNodeToReach.heuristic:
+                    bestNodeToReach = currentNode
 
         # extract the move from the best node {nodeToReach}.
         return GameMove().fromGameNode(bestNodeToReach)

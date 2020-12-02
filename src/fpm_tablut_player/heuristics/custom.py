@@ -1,50 +1,76 @@
 import random
 
 from fpm_tablut_player.libraries import GameTree, GameNode, GameState
-from fpm_tablut_player.utils import DebugUtils
-from fpm_tablut_player.heuristics import Heuristic
+from fpm_tablut_player.utils import DebugUtils, GameUtils
 
 
 ###
 
+ESCAPE_CELLS: list = GameUtils.getEscapeCells()
 
-class CustomHeuristic(Heuristic):
-    State: GameState
-    Escapes: list
+###
 
-    def __init__(self):
-        self.Escapes = [(1, 0), (2, 0), (6, 0), (7, 0),
-                        (0, 1), (0, 2), (0, 6), (0, 7),
-                        (1, 8), (2, 8), (6, 8), (7, 8),
-                        (8, 1), (8, 2), (8, 6), (8, 7)]
 
-    def iskingAlive(self) -> bool:
-        return self.State.King is not None
+class CustomHeuristic():
 
-    def isKingOnEscapeArea(self) -> bool:
+    @staticmethod
+    def __iskingAlive(currentState: GameState) -> bool:
+        return currentState.state.King is not None
+
+    @staticmethod
+    def __isKingOnEscapeArea(currentState: GameState) -> bool:
         found = False
-        for escape in self.Escapes:
-            if escape == self.State.King:
+        for escape in ESCAPE_CELLS:
+            if escape == currentState.King:
                 found = True
                 break
         return found
 
-    # def kingIsNearTheEscape(self):
+    @staticmethod
+    def __kingIsNearTheEscape(currentState: GameState):
+        pass
 
-    def getPlayablePawns(self, turn: str) -> int:
-        if turn == "black":
-            return self.State.BlackNumber
-        return self.State.WhiteNumber
+    @staticmethod
+    def __getPlayablePawns(currentState: GameState) -> int:
+        if currentState.turn == "black":
+            return currentState.state.BlackNumber
+        return currentState.state.WhiteNumber
 
-    # def blackPawnNearTheKing(self):
-    # def getNumberOfKills(self) ->int:
+    @staticmethod
+    def __blackPawnNearTheKing(currentState: GameState):
+        #
+        # TODO: missing ...
+        #
+        pass
 
-    # def computeForBlack(self, node: GameNode, initialState: GameState):
-    # def computeForWhite(self, node: GameNode, initialState: GameState):
+    @staticmethod
+    def __getNumberOfKills(currentState: GameState) -> int:
+        #
+        # TODO: missing ...
+        #
+        pass
 
-    def assignValue(self, node: GameNode, initialState: GameState):
-<<<<<<< HEAD
-        self.state=GameState().createFromMoves(initialState, node.moves)
-=======
-        self.state = GameState().createfromGameNode(initialState, node)
->>>>>>> dfc6eb735936e19aec2109abcc0ae8769bebb267
+    @staticmethod
+    def __computeForBlack(currentState: GameState):
+        #
+        # TODO: missing ...
+        #
+        pass
+
+    @staticmethod
+    def __computeForWhite(currentState: GameState):
+        #
+        # TODO: missing ...
+        #
+        pass
+
+    ###
+
+    @staticmethod
+    def assignValue(initialState: GameState, node: GameNode):
+        currentState = GameState().createFromMoves(initialState, node.moves)
+
+        # ########################################
+        # TODO: [@contimatteo] remove this logic #
+        node.heuristic = random.randint(1, 101)  #
+        # ########################################
