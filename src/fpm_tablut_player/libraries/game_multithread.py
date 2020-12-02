@@ -66,7 +66,7 @@ class GameMultithread():
                     thread_index, currentRootNode.depth])
                 break
             if currentRootNode.depth > int(CONFIGS._GAME_TREE_MAX_DEPTH):
-                DebugUtils.info("[{}] >> (TreeGeneration) max-depth", [thread_index])
+                DebugUtils.info("[{}] >> (TreeGeneration) max-depth reached", [thread_index])
                 DebugUtils.info("[{}] >> (TreeGeneration) depth = {}", [
                     thread_index, currentRootNode.depth])
                 break
