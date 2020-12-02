@@ -1,6 +1,6 @@
 import random
 
-from fpm_tablut_player.libraries import GameTree, GameNode, GameState
+from fpm_tablut_player.libraries import GameNode, GameState
 from fpm_tablut_player.utils import DebugUtils, GameUtils
 
 
