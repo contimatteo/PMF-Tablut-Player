@@ -212,83 +212,82 @@ class CustomHeuristic():
 
     ###
 
-    # @staticmethod
-    # def assignValue(initialState: GameState, node: GameNode):
-    #     value: int = 0
-    #     currentState = None
-    #     my_player_role = GameUtils.turnToString(CONFIGS.APP_ROLE)
-    #
-    #     try:
-    #         currentState = GameState().createFromMoves(initialState, node.moves)
-    #     except Exception as error:
-    #         if error.__class__.__name__ == "WhiteWinsException":
-    #             if my_player_role == "white":
-    #                 value = 1000000
-    #             else:
-    #                 value = -1000000
-    #         elif error.__class__.__name__ == "BlackWinsException":
-    #             if my_player_role == "white":
-    #                 value = -1000000
-    #             else:
-    #                 value = 1000000
-    #         else:
-    #             value = 0
-    #
-    #     # ########################################
-    #     # TODO: [@contimatteo] remove this logic #
-    #     value = random.randint(1, 101)
-    #     # ########################################
-    #
-    #     node.heuristic = value
-
     @staticmethod
-    def assignValue(initialState: GameState, node: GameNode, deb: int):
-        traceback.print_stack()
-        DebugUtils.space()
-        DebugUtils.space()
-        DebugUtils.space()
-        DebugUtils.space()
-        DebugUtils.info("DEBUG: {}", [deb])
-        board = [["EMPTY", "EMPTY", "EMPTY", "EMPTY", "BLACK", "BLACK", "EMPTY", "EMPTY", "EMPTY"],
-                 ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY"],
-                 ["EMPTY", "EMPTY", "EMPTY", "BLACK", "WHITE", "BLACK", "EMPTY", "EMPTY", "EMPTY"],
-                 ["BLACK", "EMPTY", "EMPTY", "EMPTY", "WHITE", "EMPTY", "EMPTY", "EMPTY", "BLACK"],
-                 ["BLACK", "BLACK", "WHITE", "WHITE", "THRONE", "WHITE", "WHITE", "BLACK", "BLACK"],
-                 ["BLACK", "EMPTY", "EMPTY", "EMPTY", "WHITE", "KING", "EMPTY", "EMPTY", "BLACK"],
-                 ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "WHITE", "EMPTY", "EMPTY", "EMPTY", "EMPTY"],
-                 ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "BLACK", "EMPTY", "EMPTY", "EMPTY", "EMPTY"],
-                 ["EMPTY", "EMPTY", "EMPTY", "BLACK", "BLACK", "BLACK", "EMPTY", "EMPTY", "EMPTY"],
-                 ]
-
-        initialServerState = {"board": board, "turn": "WHITE"}
-        moves = [{'from': (4, 6), 'to': (2, 6)}]
-
-        initialGameState = GameState().createFromServerState(initialServerState)
-        #moves = initialGameState.getPossibleMoves("white")
-
-        # for move in moves:
-        #    print(move)
-
-        #print("MOVES ",len(moves),"\n\n")
-        currentState = GameState().createFromMoves(initialGameState, moves)
-        CustomHeuristic.__showGame(currentState.state)
-        currentState.turn = "white"
-        CustomHeuristic.__computeForWhite(currentState)
-        DebugUtils.space()
-        DebugUtils.space()
-        DebugUtils.info("-------_____-------------______", [])
-
-        #currentState = GameState().createFromMoves(initialState, node.moves)
-
-        # if node.turn == "white":
-        #    CustomHeuristic.__computeForWhite(currentState)
-        # else:
-        #    CustomHeuristic.__computeForBlack(currentState)
-
+    def assignValue(initialState: GameState, node: GameNode):
+        value: int = None
+        currentState = None
+        my_player_role = GameUtils.turnToString(CONFIGS.APP_ROLE)
+    
+        try:
+            currentState = GameState().createFromMoves(initialState, node.moves)
+        except Exception as error:
+            if error.__class__.__name__ == "WhiteWinsException":
+                if my_player_role == "white":
+                    value = 1000000
+                else:
+                    value = -1000000
+            elif error.__class__.__name__ == "BlackWinsException":
+                if my_player_role == "white":
+                    value = -1000000
+                else:
+                    value = 1000000
+    
         # ########################################
         # TODO: [@contimatteo] remove this logic #
-        #node.heuristic = random.randint(1, 101)  #
+        if value is None:
+            value = random.randint(1, 101)
         # ########################################
+    
+        node.heuristic = value
+
+    # @staticmethod
+    # def assignValue(initialState: GameState, node: GameNode, deb: int = 0):
+    #     traceback.print_stack()
+    #     DebugUtils.space()
+    #     DebugUtils.space()
+    #     DebugUtils.space()
+    #     DebugUtils.space()
+    #     DebugUtils.info("DEBUG: {}", [deb])
+    #     board = [["EMPTY", "EMPTY", "EMPTY", "EMPTY", "BLACK", "BLACK", "EMPTY", "EMPTY", "EMPTY"],
+    #              ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY"],
+    #              ["EMPTY", "EMPTY", "EMPTY", "BLACK", "WHITE", "BLACK", "EMPTY", "EMPTY", "EMPTY"],
+    #              ["BLACK", "EMPTY", "EMPTY", "EMPTY", "WHITE", "EMPTY", "EMPTY", "EMPTY", "BLACK"],
+    #              ["BLACK", "BLACK", "WHITE", "WHITE", "THRONE", "WHITE", "WHITE", "BLACK", "BLACK"],
+    #              ["BLACK", "EMPTY", "EMPTY", "EMPTY", "WHITE", "KING", "EMPTY", "EMPTY", "BLACK"],
+    #              ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "WHITE", "EMPTY", "EMPTY", "EMPTY", "EMPTY"],
+    #              ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "BLACK", "EMPTY", "EMPTY", "EMPTY", "EMPTY"],
+    #              ["EMPTY", "EMPTY", "EMPTY", "BLACK", "BLACK", "BLACK", "EMPTY", "EMPTY", "EMPTY"],
+    #              ]
+
+    #     initialServerState = {"board": board, "turn": "WHITE"}
+    #     moves = [{'from': (4, 6), 'to': (2, 6)}]
+
+    #     initialGameState = GameState().createFromServerState(initialServerState)
+    #     #moves = initialGameState.getPossibleMoves("white")
+
+    #     # for move in moves:
+    #     #    print(move)
+
+    #     #print("MOVES ",len(moves),"\n\n")
+    #     currentState = GameState().createFromMoves(initialGameState, moves)
+    #     CustomHeuristic.__showGame(currentState.state)
+    #     currentState.turn = "white"
+    #     CustomHeuristic.__computeForWhite(currentState)
+    #     DebugUtils.space()
+    #     DebugUtils.space()
+    #     DebugUtils.info("-------_____-------------______", [])
+
+    #     #currentState = GameState().createFromMoves(initialState, node.moves)
+
+    #     # if node.turn == "white":
+    #     #    CustomHeuristic.__computeForWhite(currentState)
+    #     # else:
+    #     #    CustomHeuristic.__computeForBlack(currentState)
+
+    #     # ########################################
+    #     # TODO: [@contimatteo] remove this logic #
+    #     #node.heuristic = random.randint(1, 101)  #
+    #     # ########################################
 
 
 ###

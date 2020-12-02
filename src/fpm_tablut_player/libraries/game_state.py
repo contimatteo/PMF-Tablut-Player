@@ -407,6 +407,7 @@ class GameState:
 
         # print("after killing",killed_nord,killed_est,killed_ovest,killed_sud)
         FinalDeaths = killed_nord+killed_est+killed_ovest+killed_sud
+
         self.changeTurn()
         self.FinalDeaths = FinalDeaths
         # print("FINALDEATH: ",self.FinalDeaths)
@@ -445,6 +446,7 @@ class GameState:
             if self.turn == "white":
                 raise BlackWinsException("(GameState): king not found.")
             else:
+                # INFO: unreachable code detected. Don't move it (for security reason).
                 raise WhiteWinsException("(GameState): king not found.")
 
         if self.King in ESCAPE_CELLS:
@@ -468,9 +470,10 @@ class GameState:
         internalState["board"] = endingGameState.state
         internalState["turn"] = endingGameState.turn
 
-        # killed=endingGameState.FinalDeaths
+        killed = endingGameState.FinalDeaths
         endingGameState = GameState().createFromServerState(internalState)
-        # endingGameState.FinalDeaths=killed
+        endingGameState.FinalDeaths = killed
+
         return endingGameState
 
     def getPossibleMoves(self, turn) -> list:
