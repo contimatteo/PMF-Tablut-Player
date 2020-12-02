@@ -261,46 +261,42 @@ class GameState:
             return {"WHITE", "KING"}
 
     def Killed(self, coord, pawn_color, pos) -> list:
-        # print("Killed function: ",coord)
         if self.state[coord] in pawn_color:  # {"WHITE,"KING"}     {"BLACK"}
             MustBeKilled = []
             pawn_considered = self.state[coord]
-            if pawn_considered == "KING":
+            if pawn_considered == "KING" and coord == (4, 4):
                 King = coord
-                # print("I'm considering King",King)
                 dic = self.getDist1(coord)[0]
-                # print("AAAAAAAAAAAAAAAAAAA",dic)
-                # print("BBBBBBBBBBBBBBBBBBB",dic["nord"])
                 nord = [self.state[(dic["nord"])]]
                 est = [self.state[(dic["est"])]]
                 ovest = [self.state[(dic["ovest"])]]
                 sud = [self.state[(dic["sud"])]]
-
                 list_King = []
                 list_King = nord+est+ovest+sud
-                # print("\nlistKing: ",list_King)
                 count = 0
                 for e in list_King:
                     if e == "BLACK":
                         count = count+1
-                if count == 3 and ("THRONE" in list_King or "EMPTY" == self.state[(4, 4)]):
-                    # print("cacca1")
+                if count == 4:
                     self.deletePawn(coord)
                     MustBeKilled.append(King)
-                elif count == 4 and King == (4, 4):
-                    # print("cacca2")
+
+            elif pawn_considered == "KING" and coord in {(4, 3), (3, 4), (4, 5), (5, 4)}:
+                King = coord
+                dic = self.getDist1(coord)[0]
+                nord = [self.state[(dic["nord"])]]
+                est = [self.state[(dic["est"])]]
+                ovest = [self.state[(dic["ovest"])]]
+                sud = [self.state[(dic["sud"])]]
+                list_King = []
+                list_King = nord+est+ovest+sud
+                count = 0
+                for e in list_King:
+                    if e == "BLACK":
+                        count = count+1
+                if count == 3:
                     self.deletePawn(coord)
                     MustBeKilled.append(King)
-                else:
-
-                    est = self.state[(coord[0], coord[1]+1)]
-                    ovest = self.state[(coord[0], coord[1]-1)]
-                    nord = self.state[(coord[0]-1, coord[1])]
-                    sud = self.state[(coord[0]+1, coord[1])]
-
-                    if count == 2 and ((est == ovest and est == "BLACK") or (nord == sud and nord == "BLACK")) and ("THRONE" not in list_King) and (King not in [(4, 4), (4, 3), (3, 4), (4, 5), (5, 4)]):
-                        self.deletePawn(coord)
-                        MustBeKilled.append(King)
 
             else:
                 if pos == "est" and coord[1]+1 < 9:
@@ -420,7 +416,7 @@ class GameState:
         self.WhiteList = []
         self.BlackList = []
         self.King = None
-        
+
         for i in range(0, len(self.state)):
             for j in range(len(self.state[i, :])):
                 if self.state[i, j] == "BLACK":
@@ -431,7 +427,7 @@ class GameState:
                     self.WhiteList.append((i, j))
                 if self.state[i, j] == "KING":
                     self.King = ((i, j))
-        
+
         if self.King is None:
             raise Exception("(GameState): king not found.")
 
