@@ -41,7 +41,7 @@ class GameMultithread():
         return str(self.turn) == str(CONFIGS.APP_ROLE)
 
     def __generateSearchTreeInParallel(self, threadParams: tuple) -> GameTree:
-        currentTurn = CONFIGS.APP_ROLE
+        currentTurn = GameUtils.turnToString(CONFIGS.APP_ROLE)
         thread_index = threadParams[0]
         nodes_generated_counter = 0
 
@@ -58,7 +58,9 @@ class GameMultithread():
 
         # start visiting the tree with a BFS search.
         while nodesToVisit:
+            currentGameState: GameState = None
             currentRootNode = nodesToVisit.pop(0)
+            #
             # check if the time for generating the tree is not expired.
             time_left = timer.get_time_left(CONFIGS.GAME_TREE_GENERATION_TIMEOUT)
             if time_left <= 0:
@@ -72,8 +74,11 @@ class GameMultithread():
                     thread_index, currentRootNode.depth])
                 break
             #
-            # create a {GameState} instance satrting from a GameNode moves.
-            currentGameState = GameState().createFromMoves(self.gameState, currentRootNode.moves)
+            # try to create a {GameState} instance starting from a GameNode moves.
+            try:
+                currentGameState = GameState().createFromMoves(self.gameState, currentRootNode.moves)
+            except Exception as _:
+                continue
             # get possible moves
             moves = currentGameState.getPossibleMoves(currentRootNode.turn)
             #
@@ -86,7 +91,7 @@ class GameMultithread():
                 nodes_generated_counter += 1
                 #
                 depth = currentRootNode.depth + 1
-                nextTurn = GameUtils.togglTurn(currentTurn)
+                nextTurn = GameUtils.togglTurn(currentRootNode.turn)
                 movesToSave = list(currentRootNode.moves) + [move]
                 #
                 newNode = GameNode().initialize(currentRootNode, nextTurn, movesToSave, depth)

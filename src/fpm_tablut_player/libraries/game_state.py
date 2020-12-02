@@ -16,6 +16,7 @@ CAMP_CELLS = GameUtils.getCampCells()
 
 class GameState:
     state: [[]]
+    initialTurn: str
     turn: str
     BlackNumber: int
     WhiteNumber: int
@@ -29,6 +30,7 @@ class GameState:
     def __init__(self):
         self.state = []
         self.turn = None
+        self.initialTurn = None
 
     ###
 
@@ -181,6 +183,7 @@ class GameState:
             # print("Lista -->: ",ListOfReachableCoordFinal,"\n")
 
             return ListOfReachableCoordFinal
+
         DebugUtils.error(
             "Error in GameState.getMostNear, probably the point_considered is EMPTY", [])
         return False
@@ -333,6 +336,12 @@ class GameState:
             DebugUtils.error("Killed error", [])
             return []
 
+    def __get_color_of_pawn_at(self, coordinate) -> str:
+        cell = self.state[coordinate]
+        if cell == "WHITE" or cell == "KING":
+            return "white"
+        return "black"
+
     def __computeKill(self, move):
         self.FinalDeaths = []
         # print("computekill: ",self.turn.upper()," turn")
@@ -341,9 +350,9 @@ class GameState:
         self.movePawnFromTo(starting_coord, ending_coord)
         # print("\ndopo che mi sono mosso\n",self.state)
 
-        if self.state[ending_coord] != self.turn.upper():
+        if self.__get_color_of_pawn_at(ending_coord) != self.turn.lower():
             # TODO: [@contimatteo] why this ?
-            # DebugUtils.error("Error on moving a pawn of the enemy lead", [])
+            DebugUtils.error("Error on moving a pawn of the enemy lead", [])
             # TODO: [@contimatteo -> @primiano] why the code below will raise an error ?
             return self
 
@@ -406,9 +415,12 @@ class GameState:
         self.turn = GameUtils.turnToString(stateFromServer["turn"])
         self.state = np.array(stateFromServer["board"], dtype=object)
         self.BlackNumber = 0
+
         self.WhiteNumber = 0
         self.WhiteList = []
         self.BlackList = []
+        self.King = None
+        
         for i in range(0, len(self.state)):
             for j in range(len(self.state[i, :])):
                 if self.state[i, j] == "BLACK":
@@ -419,18 +431,15 @@ class GameState:
                     self.WhiteList.append((i, j))
                 if self.state[i, j] == "KING":
                     self.King = ((i, j))
-        try:
-            # print("King position -> ",self.King)
-            self.King
-        except:
-            raise Exception("king not found")
+        
+        if self.King is None:
+            raise Exception("(GameState): king not found.")
 
-        # TODO: [@contimatteo] is really needed ?
+        if self.King in ESCAPE_CELLS:
+            raise Exception("(GameState): king is on a escape cell.")
+
         if self.BlackNumber == 0 or self.BlackList == []:
-            raise Exception("no Black pawns on the board")
-
-        # TODO: [@contimatteo -> @primiano] missing case: no white pawns and no king ...
-        # ...
+            raise Exception("(GameState): no black pawns on the board.")
 
         return self
 
@@ -441,8 +450,6 @@ class GameState:
     def createFromMoves(self, initialGameState, moves):
         endingGameState = copy.deepcopy(initialGameState)
         for move in moves:
-            # print("mossa. ->",move)
-
             endingGameState = endingGameState.__computeKill(move)  # turno bianco= turno nero.uccidi
 
         internalState = {}
@@ -457,7 +464,10 @@ class GameState:
     def getPossibleMoves(self, turn) -> list:
         # giving turn, white or black, return the list of all possible moves for white or black pawns
         Moves = []
-        self.turn = turn
+
+        self.turn = GameUtils.turnToString(turn)
+        self.initialTurn = GameUtils.turnToString(turn)
+
         if turn == "white":
             for point in self.WhiteList:
                 a = self.getMoveFromCoord(point)
