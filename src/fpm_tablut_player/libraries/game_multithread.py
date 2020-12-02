@@ -59,7 +59,7 @@ class GameMultithread():
         # start visiting the tree with a BFS search.
         while nodesToVisit:
             currentGameState: GameState = None
-            currentRootNode = nodesToVisit.pop(0)
+            currentRootNode: GameNode = nodesToVisit.pop(0)
             #
             # check if the time for generating the tree is not expired.
             time_left = timer.get_time_left(CONFIGS.GAME_TREE_GENERATION_TIMEOUT)
@@ -75,6 +75,7 @@ class GameMultithread():
                 break
             #
             # try to create a {GameState} instance starting from a GameNode moves.
+            currentGameState: GameState = None
             try:
                 currentGameState = GameState().createFromMoves(self.gameState, currentRootNode.moves)
             except Exception as _:
@@ -165,12 +166,15 @@ class GameMultithread():
                     bestNodeToReach = currentNode
 
         # extract the move from the best node {nodeToReach}.
-        return GameMove().fromGameNode(bestNodeToReach)
+        gameMove = GameMove().fromGameNode(bestNodeToReach)
+
+        DebugUtils.info("server move: {} -> {}", [gameMove.fromCell, gameMove.toCell])
+
+        return gameMove
 
     def __showGame(self, board):
         B = list(board)
         row_str = ""
-
 
         OKBLUE = '\033[94m'
         OKCYAN = '\033[96m'
@@ -181,23 +185,25 @@ class GameMultithread():
 
         DebugUtils.space()
         for i in range(9):
-            DebugUtils.info("{}----- ----- ----- ----- ----- ----- ----- ----- -----{}",[OKGREEN,ENDC])
-            row_str=""
+            DebugUtils.info(
+                "{}----- ----- ----- ----- ----- ----- ----- ----- -----{}", [OKGREEN, ENDC])
+            row_str = ""
             for j in range(9):
-                row_str+=""+OKGREEN+"| "+ENDC
+                row_str += ""+OKGREEN+"| "+ENDC
                 if B[i][j] == "WHITE":
                     row_str += "W"
                 elif B[i][j] == "BLACK":
-                    row_str+=""+WARNING+"B"+ENDC
+                    row_str += ""+WARNING+"B"+ENDC
                 elif B[i][j] == "THRONE":
-                    row_str+=""+OKBLUE+"T"+ENDC
+                    row_str += ""+OKBLUE+"T"+ENDC
                 elif B[i][j] == "KING":
-                    row_str+=""+FAIL+"K"+ENDC
+                    row_str += ""+FAIL+"K"+ENDC
                 else:
-                    row_str+=" "
-                row_str+=""+OKGREEN+" | "+ENDC
-            DebugUtils.info(row_str,[])
-            DebugUtils.info("{}----- ----- ----- ----- ----- ----- ----- ----- -----{}",[OKGREEN,ENDC])
+                    row_str += " "
+                row_str += ""+OKGREEN+" | "+ENDC
+            DebugUtils.info(row_str, [])
+            DebugUtils.info(
+                "{}----- ----- ----- ----- ----- ----- ----- ----- -----{}", [OKGREEN, ENDC])
         DebugUtils.space()
 
     ###
@@ -205,9 +211,6 @@ class GameMultithread():
     def start(self):
         DebugUtils.space()
         initial_state = self.SocketManager.initialize()
-
-        DebugUtils.info("initial state = {}", [initial_state])
-        DebugUtils.space()
 
         # try to play (if I'm the white player ...).
         self.play(initial_state)
