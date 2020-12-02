@@ -34,7 +34,8 @@ class GameMultithread():
     def __loadGameState(self, stateFromServer: dict):
         self.gameState = GameState()
         self.gameState.createFromServerState(stateFromServer)
-        DebugUtils.info("BLACKS: {} WHITES: {} KING: {}",[self.gameState.BlackNumber,self.gameState.WhiteNumber,self.gameState.King])
+        DebugUtils.info("BLACKS: {} WHITES: {} KING: {}", [
+                        self.gameState.BlackNumber, self.gameState.WhiteNumber, self.gameState.King])
 
     def __is_my_turn(self) -> bool:
         return str(self.turn) == str(CONFIGS.APP_ROLE)
@@ -66,7 +67,7 @@ class GameMultithread():
                     thread_index, currentRootNode.depth])
                 break
             if currentRootNode.depth > int(CONFIGS._GAME_TREE_MAX_DEPTH):
-                DebugUtils.info("[{}] >> (TreeGeneration) max-depth", [thread_index])
+                DebugUtils.info("[{}] >> (TreeGeneration) max-depth reached", [thread_index])
                 DebugUtils.info("[{}] >> (TreeGeneration) depth = {}", [
                     thread_index, currentRootNode.depth])
                 break
@@ -110,8 +111,8 @@ class GameMultithread():
         # start the timer.
         timer = Timer().start()
         # algorithm
-        #algorithm = MinMaxAlgorithm("Random")
-        algorithm = AlphaBetaCutAlgorithm("Random")
+        # algorithm = MinMaxAlgorithm()
+        algorithm = AlphaBetaCutAlgorithm()
 
         # extract the best node.
         nodeToReach: GameNode = algorithm.getMorePromisingNode(
@@ -120,7 +121,7 @@ class GameMultithread():
         #
         DebugUtils.info("[{}] >> (AlphaBetaCutAlgorithm) ended in {} seconds",
                         [thread_index, timer.get_elapsed_time()])
-        #DebugUtils.info("       BEST MOVE {}",[nodeToReach.moves])
+        # DebugUtils.info("       BEST MOVE {}",[nodeToReach.moves])
         # stop the timer.
         timer.stop()
 
@@ -150,60 +151,43 @@ class GameMultithread():
 
         # find the best node inside the {bestNodesToReach} list.
         bestNodeToReach: GameNode = bestNodesToReach[0]
-        for nodeToReach in bestNodesToReach:
-            if nodeToReach.heuristic > bestNodeToReach.heuristic:
-                bestNodeToReach = nodeToReach
+        for currentNode in bestNodesToReach:
+            if self.turn == "white":
+                if currentNode.heuristic > bestNodeToReach.heuristic:
+                    bestNodeToReach = currentNode
+            else:
+                if currentNode.heuristic < bestNodeToReach.heuristic:
+                    bestNodeToReach = currentNode
 
         # extract the move from the best node {nodeToReach}.
         return GameMove().fromGameNode(bestNodeToReach)
 
-    ###
-
-    def showGame(self,board):
+    def __showGame(self, board):
         B = list(board)
-        row_str=""
+        row_str = ""
 
         DebugUtils.space()
         for i in range(9):
-            DebugUtils.info("----- ----- ----- ----- ----- ----- ----- ----- ----- ",[])
-            row_str=""
+            DebugUtils.info("----- ----- ----- ----- ----- ----- ----- ----- ----- ", [])
+            row_str = ""
             for j in range(9):
-                row_str+="| "
+                row_str += "| "
                 if B[i][j] == "WHITE":
-                    row_str+="W"
+                    row_str += "W"
                 elif B[i][j] == "BLACK":
-                    row_str+="B"
+                    row_str += "B"
                 elif B[i][j] == "THRONE":
-                    row_str+="T"
+                    row_str += "T"
                 elif B[i][j] == "KING":
-                    row_str+="K"
+                    row_str += "K"
                 else:
-                    row_str+=" "
-                row_str+=" | "
-            DebugUtils.info(row_str,[])
-            DebugUtils.info("----- ----- ----- ----- ----- ----- ----- ----- ----- ",[])
+                    row_str += " "
+                row_str += " | "
+            DebugUtils.info(row_str, [])
+            DebugUtils.info("----- ----- ----- ----- ----- ----- ----- ----- ----- ", [])
         DebugUtils.space()
 
-
-        # print("| B | |   | |   | |   | |   | |   | |   | |   | |   |")
-        # print("----- ----- ----- ----- ----- ----- ----- ----- -----")
-        # print("|   | |   | |   | |   | |   | |   | |   | |   | |   |")
-        # print("----- ----- ----- ----- ----- ----- ----- ----- -----")
-        # print("|   | |   | |   | |   | |   | |   | |   | |   | |   |")
-        # print("----- ----- ----- ----- ----- ----- ----- ----- -----")
-        # print("|   | |   | |   | |   | |   | |   | |   | |   | |   |")
-        # print("----- ----- ----- ----- ----- ----- ----- ----- -----")
-        # print("|   | |   | |   | |   | |   | |   | |   | |   | |   |")
-        # print("----- ----- ----- ----- ----- ----- ----- ----- -----")
-        # print("|   | |   | |   | |   | |   | |   | |   | |   | |   |")
-        # print("----- ----- ----- ----- ----- ----- ----- ----- -----")
-        # print("|   | |   | |   | |   | |   | |   | |   | |   | |   |")
-        # print("----- ----- ----- ----- ----- ----- ----- ----- -----")
-        # print("|   | |   | |   | |   | |   | |   | |   | |   | |   |")
-        # print("----- ----- ----- ----- ----- ----- ----- ----- -----")
-        # print("|   | |   | |   | |   | |   | |   | |   | |   | |   |")
-        # print("----- ----- ----- ----- ----- ----- ----- ----- -----")
-
+    ###
 
     def start(self):
         DebugUtils.space()
@@ -226,8 +210,8 @@ class GameMultithread():
         if not self.__is_my_turn():
             return
         else:
-            #DebugUtils.info("stateFromServer -> {}", [str(stateFromServer)])
-            self.showGame(stateFromServer["board"])
+            # DebugUtils.info("stateFromServer -> {}", [str(stateFromServer)])
+            self.__showGame(stateFromServer["board"])
 
         # convert the state received from the server to a {GameState} instance.
         self.__loadGameState(stateFromServer)
