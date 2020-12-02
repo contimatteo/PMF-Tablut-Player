@@ -28,6 +28,7 @@ class GameState:
 
     def __init__(self):
         self.state = []
+        self.FinalDeaths = []
         self.turn = None
         self.FinalDeaths = []
 
