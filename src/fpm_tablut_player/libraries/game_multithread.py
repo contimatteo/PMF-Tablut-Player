@@ -71,8 +71,8 @@ class GameMultithread():
                                 thread_index, currentRootNode.depth])
                 break
             #
-            # create a {GameState} instance satrting from a {GameNode}.
-            currentGameState = GameState().createfromGameNode(self.gameState, currentRootNode)
+            # create a {GameState} instance satrting from a GameNode moves.
+            currentGameState = GameState().createFromMoves(self.gameState, currentRootNode.moves)
             # get possible moves
             moves = currentGameState.getPossibleMoves(currentRootNode.turn)
             #
