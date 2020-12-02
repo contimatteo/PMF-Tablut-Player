@@ -163,25 +163,33 @@ class GameMultithread():
         B = list(board)
         row_str=""
 
+
+        OKBLUE = '\033[94m'
+        OKCYAN = '\033[96m'
+        OKGREEN = '\033[92m'
+        WARNING = '\033[93m'
+        FAIL = '\033[91m'
+        ENDC = '\033[0m'
+
         DebugUtils.space()
         for i in range(9):
-            DebugUtils.info("----- ----- ----- ----- ----- ----- ----- ----- ----- ",[])
+            DebugUtils.info("{}----- ----- ----- ----- ----- ----- ----- ----- -----{}",[OKGREEN,ENDC])
             row_str=""
             for j in range(9):
-                row_str+="| "
+                row_str+=""+OKGREEN+"| "+ENDC
                 if B[i][j] == "WHITE":
                     row_str+="W"
                 elif B[i][j] == "BLACK":
-                    row_str+="B"
+                    row_str+=""+WARNING+"B"+ENDC
                 elif B[i][j] == "THRONE":
-                    row_str+="T"
+                    row_str+=""+OKBLUE+"T"+ENDC
                 elif B[i][j] == "KING":
-                    row_str+="K"
+                    row_str+=""+FAIL+"K"+ENDC
                 else:
                     row_str+=" "
-                row_str+=" | "
+                row_str+=""+OKGREEN+" | "+ENDC
             DebugUtils.info(row_str,[])
-            DebugUtils.info("----- ----- ----- ----- ----- ----- ----- ----- ----- ",[])
+            DebugUtils.info("{}----- ----- ----- ----- ----- ----- ----- ----- -----{}",[OKGREEN,ENDC])
         DebugUtils.space()
 
 
