@@ -34,6 +34,7 @@ class GameMultithread():
     def __loadGameState(self, stateFromServer: dict):
         self.gameState = GameState()
         self.gameState.createFromServerState(stateFromServer)
+        DebugUtils.info("BLACKS: {} WHITES: {} KING: {}",[self.gameState.BlackNumber,self.gameState.WhiteNumber,self.gameState.King])
 
     def __is_my_turn(self) -> bool:
         return str(self.turn) == str(CONFIGS.APP_ROLE)

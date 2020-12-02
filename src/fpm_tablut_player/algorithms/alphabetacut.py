@@ -30,8 +30,6 @@ class AlphaBetaCutAlgorithm():
                 #DebugUtils.info("current node has a value",[])
                 alpha=None
                 beta =None
-
-
                 if x.parent.turn == self.min: # parent is min node
                     #DebugUtils.info("     parent is a min node => status",[])
                     beta = x.parent.heuristic
@@ -40,7 +38,6 @@ class AlphaBetaCutAlgorithm():
                         beta = x.heuristic
                         #beta o la prima volta che vine ne inizializzato o trova un volore migliore
 
-
                     if x.parent.parent is not None:
                         alpha = x.parent.parent.heuristic
 
@@ -48,15 +45,18 @@ class AlphaBetaCutAlgorithm():
                     x.parent.heuristic = beta
                     if alpha is not None and alpha >= beta:
                         #DebugUtils.info("parent is min => cancello a partire da {}",[(x.debugIndex+1)])
-                        DebugUtils.info("L {} CHILDREN {}",[len(L),x.parent.numberChildren])
+                        if len(L)<= x.parent.numberChildren:
+                            DebugUtils.info("MIN CASE L {} CHILDREN {}",[len(L),x.parent.numberChildren])
                         while x.parent.numberChildren > 0 :#remove all x.parent children
                             L.pop()
                             #Log.pop()
-                            x.parent.numberChildren = x.parent.numberChildren -1
+                            x.parent.numberChildren-=1
                     else:
-                        x.parent.numberChildren = x.parent.numberChildren -1
-                    L.pop()
-                    #Log.pop()
+                        #if len(L)<= x.parent.numberChildren:
+                        #    DebugUtils.info("MIN POP FUORI DAL WHILE L {} CH {}",[len(L),x.parent.numberChildren])
+                        x.parent.numberChildren-=1
+                        L.pop()
+                        #Log.pop()
                 ##################################################################  
                 else: # parent is a max node
                     #DebugUtils.info("     parent is a max node",[])
@@ -75,13 +75,17 @@ class AlphaBetaCutAlgorithm():
 
                     if beta is not None and alpha >= beta:
                         #DebugUtils.info("parent is max => cancello a partire da {}",[x.debugIndex])
+                        if len(L)<= x.parent.numberChildren:
+                            DebugUtils.info("MAX CASE L {} CHILDREN {}",[len(L),x.parent.numberChildren])
                         while x.parent.numberChildren > 0 :#remove all x.parent children
                             L.pop()
-                            x.parent.numberChildren = x.parent.numberChildren -1
+                            x.parent.numberChildren-=1
                     else:
-                        x.parent.numberChildren = x.parent.numberChildren -1
-                    L.pop()
-                    #Log.pop()
+                        #if len(L)<= x.parent.numberChildren:
+                        #    DebugUtils.info("MAX POP FUORI DAL WHILE L {} CH {}",[len(L),x.parent.numberChildren])
+                        x.parent.numberChildren-=1
+                        L.pop()
+                        #Log.pop()
 
             ##################################################################
             else:

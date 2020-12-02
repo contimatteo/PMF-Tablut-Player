@@ -37,7 +37,8 @@ class GameState:
                 if self.state[i,j]=="KING":
                     self.King=((i,j))
         try:
-            print("King position -> ",self.King)
+            #print("King position -> ",self.King)
+            self.King
         except:
             raise Exception("king not found")
         if self.BlackNumber==0 or self.BlackList==[]:
