@@ -12,10 +12,21 @@ THRONE_CELLS = GameUtils.getThroneCells()
 CAMP_CELLS = GameUtils.getCampCells()
 
 
+class BlackWinsException(Exception):
+    def __init__(self, args):
+        pass
+
+
+class WhiteWinsException(Exception):
+    def __init__(self, args):
+        pass
+
 ###
+
 
 class GameState:
     state: [[]]
+    initialTurn: str
     turn: str
     BlackNumber: int
     WhiteNumber: int
@@ -30,7 +41,7 @@ class GameState:
         self.state = []
         self.FinalDeaths = []
         self.turn = None
-        self.FinalDeaths = []
+        self.initialTurn = None
 
     ###
 
@@ -138,7 +149,7 @@ class GameState:
             return point, point_dist
         return None
 
-    def getMoveFromCoord(self, point_coord) -> object:
+    def __getMoveFromCoord(self, point_coord) -> object:
         # giving a real coordinate, return the list of possible (x,y) where the pawn can go
         ListOfReachableCoord = []
         ListOfReachableCoordFinal = []
@@ -150,7 +161,7 @@ class GameState:
                 value = DictOfNeighbour[key]
                 # print(key, '->', value)
                 if key != "point_coord":
-                    if value != None:
+                    if value is not None:
                         if key == "sud":
                             #print(key, '->',value)#
                             for i in range(point_coord[0]+1, value[0]):
@@ -183,9 +194,9 @@ class GameState:
             # print("Lista -->: ",ListOfReachableCoordFinal,"\n")
 
             return ListOfReachableCoordFinal
-        DebugUtils.error(
-            "Error in GameState.getMostNear, probably the point_considered is EMPTY", [])
-        return False
+
+        DebugUtils.error("(GameState): '.getMostNear' probably the point_considered is EMPTY", [])
+        return []
 
     def changeTurn(self) -> str:
         if self.turn == "white":
@@ -251,7 +262,7 @@ class GameState:
         # print(point,point_dist)
         return point, point_dist
 
-    def Enemy(self, turn) -> set:
+    def __enemy(self, turn) -> set:
         turno = turn.upper()
 
         if turno == "WHITE" or turno == "KING":
@@ -259,73 +270,69 @@ class GameState:
         else:
             return {"WHITE", "KING"}
 
-    def Killed(self, coord, pawn_color, pos) -> list:
-        # print("Killed function: ",coord)
+    def __killed(self, coord, pawn_color, pos) -> list:
         if self.state[coord] in pawn_color:  # {"WHITE,"KING"}     {"BLACK"}
             MustBeKilled = []
             pawn_considered = self.state[coord]
-            if pawn_considered == "KING":
+            if pawn_considered == "KING" and coord == (4, 4):
                 King = coord
-                # print("I'm considering King",King)
                 dic = self.getDist1(coord)[0]
-                # print("AAAAAAAAAAAAAAAAAAA",dic)
-                # print("BBBBBBBBBBBBBBBBBBB",dic["nord"])
                 nord = [self.state[(dic["nord"])]]
                 est = [self.state[(dic["est"])]]
                 ovest = [self.state[(dic["ovest"])]]
                 sud = [self.state[(dic["sud"])]]
-
                 list_King = []
                 list_King = nord+est+ovest+sud
-                # print("\nlistKing: ",list_King)
                 count = 0
                 for e in list_King:
                     if e == "BLACK":
                         count = count+1
-                if count == 3 and ("THRONE" in list_King or "EMPTY" == self.state[(4, 4)]):
-                    # print("cacca1")
+                if count == 4:
                     self.deletePawn(coord)
                     MustBeKilled.append(King)
-                elif count == 4 and King == (4, 4):
-                    # print("cacca2")
+
+            elif pawn_considered == "KING" and coord in {(4, 3), (3, 4), (4, 5), (5, 4)}:
+                King = coord
+                dic = self.getDist1(coord)[0]
+                nord = [self.state[(dic["nord"])]]
+                est = [self.state[(dic["est"])]]
+                ovest = [self.state[(dic["ovest"])]]
+                sud = [self.state[(dic["sud"])]]
+                list_King = []
+                list_King = nord+est+ovest+sud
+                count = 0
+                for e in list_King:
+                    if e == "BLACK":
+                        count = count+1
+                if count == 3:
                     self.deletePawn(coord)
                     MustBeKilled.append(King)
-                else:
-
-                    est = self.state[(coord[0], coord[1]+1)]
-                    ovest = self.state[(coord[0], coord[1]-1)]
-                    nord = self.state[(coord[0]-1, coord[1])]
-                    sud = self.state[(coord[0]+1, coord[1])]
-
-                    if count == 2 and ((est == ovest and est == "BLACK") or (nord == sud and nord == "BLACK")) and ("THRONE" not in list_King) and (King not in [(4, 4), (4, 3), (3, 4), (4, 5), (5, 4)]):
-                        self.deletePawn(coord)
-                        MustBeKilled.append(King)
 
             else:
                 if pos == "est" and coord[1]+1 < 9:
                     on_the_opposite_side = self.state[(coord[0], coord[1]+1)]
-                    enemy = self.Enemy(pawn_considered)
+                    enemy = self.__enemy(pawn_considered)
                     # print("\ton the opposite side",(coord[0],coord[1]+1)," -> ",on_the_opposite_side,". His enemy is ",enemy)
                     if (on_the_opposite_side in enemy) or ((coord[0], coord[1]+1) in THRONE_CELLS+CAMP_CELLS):
                         self.deletePawn(coord)
                         MustBeKilled.append(coord)
                 if pos == "ovest" and coord[1]-1 > -1:
                     on_the_opposite_side = self.state[(coord[0], coord[1]-1)]
-                    enemy = self.Enemy(pawn_considered)
+                    enemy = self.__enemy(pawn_considered)
                     # print("\ton the opposite side",(coord[0],coord[1]-1)," -> ",on_the_opposite_side,". His enemy is ",enemy)
                     if (on_the_opposite_side in enemy) or ((coord[0], coord[1]-1) in THRONE_CELLS+CAMP_CELLS):
                         self.deletePawn(coord)
                         MustBeKilled.append(coord)
                 if pos == "nord" and coord[0]-1 < -1:
                     on_the_opposite_side = self.state[(coord[0]-1, coord[1])]
-                    enemy = self.Enemy(pawn_considered)
+                    enemy = self.__enemy(pawn_considered)
                     # print("\ton the opposite side",(coord[0]-1,coord[1])," -> ",on_the_opposite_side,". His enemy is ",enemy)
                     if (on_the_opposite_side in enemy) or ((coord[0]-1, coord[1]) in THRONE_CELLS+CAMP_CELLS):
                         self.deletePawn(coord)
                         MustBeKilled.append(coord)
                 if pos == "sud" and coord[0]+1 < 9:
                     on_the_opposite_side = self.state[(coord[0]+1, coord[1])]
-                    enemy = self.Enemy(pawn_considered)
+                    enemy = self.__enemy(pawn_considered)
                     # print("\ton the opposite side",(coord[0]+1,coord[1])," -> ",on_the_opposite_side,". His enemy is ",enemy)
                     if (on_the_opposite_side in enemy) or ((coord[0]+1, coord[1]) in THRONE_CELLS+CAMP_CELLS):
                         self.deletePawn(coord)
@@ -335,6 +342,12 @@ class GameState:
             DebugUtils.error("Killed error", [])
             return []
 
+    def __get_color_of_pawn_at(self, coordinate) -> str:
+        cell = self.state[coordinate]
+        if cell == "WHITE" or cell == "KING":
+            return "white"
+        return "black"
+
     def __computeKill(self, move):
         self.FinalDeaths = []
         # print("computekill: ",self.turn.upper()," turn")
@@ -343,13 +356,13 @@ class GameState:
         self.movePawnFromTo(starting_coord, ending_coord)
         # print("\ndopo che mi sono mosso\n",self.state)
 
-        if self.state[ending_coord] != self.turn.upper():
+        if self.__get_color_of_pawn_at(ending_coord) != self.turn.lower():
             # TODO: [@contimatteo] why this ?
-            # DebugUtils.error("Error on moving a pawn of the enemy lead", [])
+            DebugUtils.error("Error on moving a pawn of the enemy lead", [])
             # TODO: [@contimatteo -> @primiano] why the code below will raise an error ?
             return self
 
-        enemy = self.Enemy(self.turn)
+        enemy = self.__enemy(self.turn)
         # print("computekill change turn : ",self.turn.upper()," turn")
         dic = self.getDist1(ending_coord)
         # print("dic ->",dic)
@@ -379,18 +392,18 @@ class GameState:
                 # print("initial coordingate x",ending_coord,"pawn to check kill",e)
                 if e[1] > ending_coord[1]:
                     # print("est initial coordingate x:",ending_coord," -> ",e,"\n")
-                    killed_est = self.Killed(e, enemy, "est")
+                    killed_est = self.__killed(e, enemy, "est")
                 else:
                     # print("ovest initial coordingate x:",ending_coord," -> ",e,"\n")
-                    killed_ovest = self.Killed(e, enemy, "ovest")
+                    killed_ovest = self.__killed(e, enemy, "ovest")
             elif ending_coord[1] == e[1]:  # nord sud
                 # print("initial coordingate y:nord or sud:",ending_coord,"pawn to check kill",e)
                 if e[0] > ending_coord[0]:
                     # print("sud initial coordingate y:",ending_coord," -> ",e,"\n")
-                    killed_sud = self.Killed(e, enemy, "sud")
+                    killed_sud = self.__killed(e, enemy, "sud")
                 else:
                     # print("nord initial coordingate y:",ending_coord," -> ",e,"\n")
-                    killed_nord = self.Killed(e, enemy, "nord")
+                    killed_nord = self.__killed(e, enemy, "nord")
 
         # print("after killing",killed_nord,killed_est,killed_ovest,killed_sud)
         FinalDeaths = killed_nord+killed_est+killed_ovest+killed_sud
@@ -405,42 +418,46 @@ class GameState:
     def createFromServerState(self, stateFromServer):
         # Load the state and the turn (asking them to the server).
         # If King is not initialized, or black pawn are zero, it return FALSE
+        self.initialTurn = GameUtils.turnToString(stateFromServer["turn"])
         self.turn = GameUtils.turnToString(stateFromServer["turn"])
+
         self.state = np.array(stateFromServer["board"], dtype=object)
         self.BlackNumber = 0
+
         self.WhiteNumber = 0
         self.WhiteList = []
         self.BlackList = []
+        self.King = None
+
         for i in range(0, len(self.state)):
             for j in range(len(self.state[i, :])):
+                self.state[i, j] = str(self.state[i, j]).upper()
                 if self.state[i, j] == "BLACK":
-                    self.BlackNumber = self.BlackNumber+1
+                    self.BlackNumber = self.BlackNumber + 1
                     self.BlackList.append((i, j))
                 if self.state[i, j] == "WHITE":
-                    self.WhiteNumber = self.WhiteNumber+1
+                    self.WhiteNumber = self.WhiteNumber + 1
                     self.WhiteList.append((i, j))
                 if self.state[i, j] == "KING":
-                    self.King = ((i, j))
-        try:
-            # print("King position -> ",self.King)
-            self.King
-        except:
-            raise Exception("king not found")
+                    self.King = ((i, j))  # TODO: [@primiano] why double '(' ?
 
-        # TODO: [@contimatteo] is really needed ?
+        if self.King is None:
+            if self.turn == "white":
+                raise BlackWinsException("(GameState): king not found.")
+            else:
+                raise WhiteWinsException("(GameState): king not found.")
+
+        if self.King in ESCAPE_CELLS:
+            raise WhiteWinsException("(GameState): king is on a escape cell.")
+
         if self.BlackNumber == 0 or self.BlackList == []:
-            raise Exception("no Black pawns on the board")
-
-        # TODO: [@contimatteo -> @primiano] missing case: no white pawns and no king ...
-        # ...
+            raise WhiteWinsException("(GameState): no black pawns on the board.")
 
         return self
 
     def createFromMoves(self, initialGameState, moves):
         endingGameState = copy.deepcopy(initialGameState)
         for move in moves:
-            # print("mossa. ->",move)
-
             endingGameState = endingGameState.__computeKill(move)  # turno bianco= turno nero.uccidi
 
         internalState = {}
@@ -453,22 +470,31 @@ class GameState:
         return endingGameState
 
     def getPossibleMoves(self, turn) -> list:
-        # giving turn, white or black, return the list of all possible moves for white or black pawns
+        # giving turn, white or black, return the list of all
+        # possible moves for white or black pawns
         Moves = []
-        self.turn = turn
+
+        self.turn = GameUtils.turnToString(turn)
+        self.initialTurn = GameUtils.turnToString(turn)
+
         if turn == "white":
+            # king
+            king_moves = self.__getMoveFromCoord(self.King)
+            Moves.append(king_moves)
+            # white pawn
             for point in self.WhiteList:
-                a = self.getMoveFromCoord(point)
+                a = self.__getMoveFromCoord(point)
                 Moves.append(a)
         else:
+            # black pawn
             for point in self.BlackList:
-                b = self.getMoveFromCoord(point)
+                b = self.__getMoveFromCoord(point)
                 Moves.append(b)
+        #
         JsonMoves = []
         for i in Moves:
             for j in i:
                 JsonMoves.append(j)
-
         # DebugUtils.info("GET POSSIBLE MOVES FROM {}\n{}",[turn,JsonMoves])
         return JsonMoves
 

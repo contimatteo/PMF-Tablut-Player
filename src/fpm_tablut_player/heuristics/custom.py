@@ -1,6 +1,7 @@
 import random
 import traceback
 
+import fpm_tablut_player.configs as CONFIGS
 from fpm_tablut_player.libraries import GameNode, GameState
 from fpm_tablut_player.utils import DebugUtils, GameUtils
 
@@ -211,6 +212,35 @@ class CustomHeuristic():
 
     ###
 
+    # @staticmethod
+    # def assignValue(initialState: GameState, node: GameNode):
+    #     value: int = 0
+    #     currentState = None
+    #     my_player_role = GameUtils.turnToString(CONFIGS.APP_ROLE)
+    #
+    #     try:
+    #         currentState = GameState().createFromMoves(initialState, node.moves)
+    #     except Exception as error:
+    #         if error.__class__.__name__ == "WhiteWinsException":
+    #             if my_player_role == "white":
+    #                 value = 1000000
+    #             else:
+    #                 value = -1000000
+    #         elif error.__class__.__name__ == "BlackWinsException":
+    #             if my_player_role == "white":
+    #                 value = -1000000
+    #             else:
+    #                 value = 1000000
+    #         else:
+    #             value = 0
+    #
+    #     # ########################################
+    #     # TODO: [@contimatteo] remove this logic #
+    #     value = random.randint(1, 101)
+    #     # ########################################
+    #
+    #     node.heuristic = value
+
     @staticmethod
     def assignValue(initialState: GameState, node: GameNode, deb: int):
         traceback.print_stack()
@@ -261,4 +291,7 @@ class CustomHeuristic():
         # ########################################
 
 
-CustomHeuristic.assignValue(None, None, 1)
+###
+
+if __name__ == "__main__":
+    CustomHeuristic.assignValue(None, None, 1)
