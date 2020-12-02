@@ -34,6 +34,7 @@ class GameMultithread():
     def __loadGameState(self, stateFromServer: dict):
         self.gameState = GameState()
         self.gameState.createFromServerState(stateFromServer)
+        DebugUtils.info("BLACKS: {} WHITES: {} KING: {}",[self.gameState.BlackNumber,self.gameState.WhiteNumber,self.gameState.King])
 
     def __is_my_turn(self) -> bool:
         return str(self.turn) == str(CONFIGS.APP_ROLE)
@@ -70,8 +71,8 @@ class GameMultithread():
                     thread_index, currentRootNode.depth])
                 break
             #
-            # create a {GameState} instance satrting from a {GameNode}.
-            currentGameState = GameState().createfromGameNode(self.gameState, currentRootNode)
+            # create a {GameState} instance satrting from a GameNode moves.
+            currentGameState = GameState().createFromMoves(self.gameState, currentRootNode.moves)
             # get possible moves
             moves = currentGameState.getPossibleMoves(currentRootNode.turn)
             #
@@ -158,6 +159,52 @@ class GameMultithread():
 
     ###
 
+    def showGame(self,board):
+        B = list(board)
+        row_str=""
+
+        DebugUtils.space()
+        for i in range(9):
+            DebugUtils.info("----- ----- ----- ----- ----- ----- ----- ----- ----- ",[])
+            row_str=""
+            for j in range(9):
+                row_str+="| "
+                if B[i][j] == "WHITE":
+                    row_str+="W"
+                elif B[i][j] == "BLACK":
+                    row_str+="B"
+                elif B[i][j] == "THRONE":
+                    row_str+="T"
+                elif B[i][j] == "KING":
+                    row_str+="K"
+                else:
+                    row_str+=" "
+                row_str+=" | "
+            DebugUtils.info(row_str,[])
+            DebugUtils.info("----- ----- ----- ----- ----- ----- ----- ----- ----- ",[])
+        DebugUtils.space()
+
+
+        # print("| B | |   | |   | |   | |   | |   | |   | |   | |   |")
+        # print("----- ----- ----- ----- ----- ----- ----- ----- -----")
+        # print("|   | |   | |   | |   | |   | |   | |   | |   | |   |")
+        # print("----- ----- ----- ----- ----- ----- ----- ----- -----")
+        # print("|   | |   | |   | |   | |   | |   | |   | |   | |   |")
+        # print("----- ----- ----- ----- ----- ----- ----- ----- -----")
+        # print("|   | |   | |   | |   | |   | |   | |   | |   | |   |")
+        # print("----- ----- ----- ----- ----- ----- ----- ----- -----")
+        # print("|   | |   | |   | |   | |   | |   | |   | |   | |   |")
+        # print("----- ----- ----- ----- ----- ----- ----- ----- -----")
+        # print("|   | |   | |   | |   | |   | |   | |   | |   | |   |")
+        # print("----- ----- ----- ----- ----- ----- ----- ----- -----")
+        # print("|   | |   | |   | |   | |   | |   | |   | |   | |   |")
+        # print("----- ----- ----- ----- ----- ----- ----- ----- -----")
+        # print("|   | |   | |   | |   | |   | |   | |   | |   | |   |")
+        # print("----- ----- ----- ----- ----- ----- ----- ----- -----")
+        # print("|   | |   | |   | |   | |   | |   | |   | |   | |   |")
+        # print("----- ----- ----- ----- ----- ----- ----- ----- -----")
+
+
     def start(self):
         DebugUtils.space()
         initial_state = self.SocketManager.initialize()
@@ -179,7 +226,8 @@ class GameMultithread():
         if not self.__is_my_turn():
             return
         else:
-            DebugUtils.info("stateFromServer -> {}", [str(stateFromServer)])
+            #DebugUtils.info("stateFromServer -> {}", [str(stateFromServer)])
+            self.showGame(stateFromServer["board"])
 
         # convert the state received from the server to a {GameState} instance.
         self.__loadGameState(stateFromServer)

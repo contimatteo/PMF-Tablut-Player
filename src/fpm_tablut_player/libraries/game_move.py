@@ -1,6 +1,7 @@
 import fpm_tablut_player.configs as CONFIGS
 
-from fpm_tablut_player.libraries.game_state import GameState, GameNode
+from fpm_tablut_player.libraries.game_state import GameState
+from fpm_tablut_player.libraries.game_node import GameNode
 
 ###
 

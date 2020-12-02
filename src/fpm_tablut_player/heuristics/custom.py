@@ -43,4 +43,8 @@ class CustomHeuristic(Heuristic):
     # def computeForWhite(self, node: GameNode, initialState: GameState):
 
     def assignValue(self, node: GameNode, initialState: GameState):
+<<<<<<< HEAD
+        self.state=GameState().createFromMoves(initialState, node.moves)
+=======
         self.state = GameState().createfromGameNode(initialState, node)
+>>>>>>> dfc6eb735936e19aec2109abcc0ae8769bebb267
