@@ -196,6 +196,7 @@ class GameState:
     def getPossibleMoves(self,turn) ->list:
         #giving turn, white or black, return the list of all possible moves for white or black pawns
         Moves=[]
+        self.turn=turn
         if turn=="white":
             for point in self.WhiteList:
                 a=self.getMoveFromCoord(point)

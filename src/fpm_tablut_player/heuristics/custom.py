@@ -13,35 +13,38 @@ class CustomHeuristic(Heuristic):
     Escapes: list
 
     def __init__(self):
-        self.Escapes=[(1,0),(2,0),(6,0),(7,0),
-                     (0,1),(0,2),(0,6),(0,7),
-                     (1,8),(2,8),(6,8),(7,8),
-                     (8,1),(8,2),(8,6),(8,7)]
+        self.Escapes = [(1, 0), (2, 0), (6, 0), (7, 0),
+                        (0, 1), (0, 2), (0, 6), (0, 7),
+                        (1, 8), (2, 8), (6, 8), (7, 8),
+                        (8, 1), (8, 2), (8, 6), (8, 7)]
 
-
-    def iskingAlive(self) ->bool:
+    def iskingAlive(self) -> bool:
         return self.State.King is not None
 
-    def isKingOnEscapeArea(self) ->bool:
-        found=False
+    def isKingOnEscapeArea(self) -> bool:
+        found = False
         for escape in self.Escapes:
             if escape == self.State.King:
-                found=True
+                found = True
                 break
         return found
 
-    #def kingIsNearTheEscape(self):
+    # def kingIsNearTheEscape(self):
 
-    def getPlayablePawns(self,turn: str) ->int:
+    def getPlayablePawns(self, turn: str) -> int:
         if turn == "black":
             return self.State.BlackNumber
         return self.State.WhiteNumber
-    
-    #def blackPawnNearTheKing(self):
-    #def getNumberOfKills(self) ->int:
 
-    #def computeForBlack(self, node: GameNode, initialState: GameState):
-    #def computeForWhite(self, node: GameNode, initialState: GameState):
+    # def blackPawnNearTheKing(self):
+    # def getNumberOfKills(self) ->int:
+
+    # def computeForBlack(self, node: GameNode, initialState: GameState):
+    # def computeForWhite(self, node: GameNode, initialState: GameState):
 
     def assignValue(self, node: GameNode, initialState: GameState):
+<<<<<<< HEAD
         self.state=GameState().createFromMoves(initialState, node.moves)
+=======
+        self.state = GameState().createfromGameNode(initialState, node)
+>>>>>>> dfc6eb735936e19aec2109abcc0ae8769bebb267

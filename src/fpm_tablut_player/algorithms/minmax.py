@@ -1,7 +1,8 @@
 from fpm_tablut_player.libraries import GameTree, GameNode, GameState
 from fpm_tablut_player.utils import DebugUtils
 from fpm_tablut_player.heuristics import Heuristic, RandomHeuristic
-import networkx as nx
+
+
 ###
 
 
@@ -38,19 +39,19 @@ class MinMaxAlgorithm():
                 children = GameTree.getChildren(tree_with_heuristics.graph, x, True)
                 if len(children) > 0:
                     L = L + children
-                else: #foglia senza euristica
+                else:  # foglia senza euristica
                     self.heuristic.assignValue(x, initialState)
 
     ###
 
     def getMorePromisingNode(self, tree_with_heuristics: GameTree, initialState: GameState) -> GameNode:
-        
+
         root = tree_with_heuristics.root
         children = GameTree.getChildren(tree_with_heuristics.graph, root, False)
 
         if len(children) == 0:
             return None
-            
+
         self.__elaborateNodeValues(tree_with_heuristics, initialState)
 
         bestNode = None
@@ -58,7 +59,8 @@ class MinMaxAlgorithm():
         #DebugUtils.info(" This root has {} children",[len(children)])
         DebugUtils.info("MinMaxAlogorithm", [])
         for node in children:
-            DebugUtils.info("       next possible move {} value {}",[str(node.moves), node.heuristic])
+            DebugUtils.info("       next possible move {} value {}",
+                            [str(node.moves), node.heuristic])
             if heuristicValue is None:
                 heuristicValue = node.heuristic
                 bestNode = node
@@ -109,7 +111,6 @@ class MinMaxAlgorithm():
 # child22.moves=[{"from":(0,0),"to":(0,2)},{"from":(0,2),"to":(2,2)}]
 
 
-
 # G=nx.DiGraph()
 # G.add_node(root)
 # G.add_edge(root,child1)
@@ -128,4 +129,3 @@ class MinMaxAlgorithm():
 
 # #print("root has ",len(tree.getChildren(tree.graph,root,True)))
 # best=minMax.getMorePromisingNode(tree,None)
-

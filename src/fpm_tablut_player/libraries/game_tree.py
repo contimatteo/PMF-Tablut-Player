@@ -22,7 +22,7 @@ class GameTree():
         self.root = rootNode
         return self
 
-    def addNode(self, parent: GameNode,nodes: [GameNode]):
+    def addNode(self, parent: GameNode, nodes: [GameNode]):
         for node in nodes:
             self.graph.add_edge(parent, node, weight=0)
 
