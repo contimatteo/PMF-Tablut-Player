@@ -133,7 +133,6 @@ class CustomHeuristic():
 
     @staticmethod
     def __getNumberOfKills(currentState: GameState) -> int:
-
         return len(currentState.FinalDeaths)
 
     @staticmethod
