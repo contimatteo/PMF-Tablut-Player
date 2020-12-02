@@ -1,2 +1,1 @@
-from .heuristic import Heuristic
-from .random import RandomHeuristic
+from .custom import CustomHeuristic

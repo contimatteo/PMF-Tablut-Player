@@ -1,6 +1,6 @@
 from fpm_tablut_player.libraries import GameTree, GameNode, GameState
 from fpm_tablut_player.utils import DebugUtils
-from fpm_tablut_player.heuristics import Heuristic, RandomHeuristic
+from fpm_tablut_player.heuristics import CustomHeuristic
 
 
 ###
@@ -9,15 +9,8 @@ from fpm_tablut_player.heuristics import Heuristic, RandomHeuristic
 class MinMaxAlgorithm():
     max: str = "white"
     min: str = "black"
-    heuristic: Heuristic
 
     ###
-
-    def __init__(self, type_heuristic: str):
-        if type_heuristic == "Random":
-            self.heuristic = RandomHeuristic()
-        else:  # default heuristic
-            self.heuristic = RandomHeuristic()
 
     def __elaborateNodeValues(self, tree_with_heuristics: GameTree, initialState: GameState):
         node = tree_with_heuristics.root
@@ -40,7 +33,7 @@ class MinMaxAlgorithm():
                 if len(children) > 0:
                     L = L + children
                 else:  # foglia senza euristica
-                    self.heuristic.assignValue(x, initialState)
+                    CustomHeuristic.assignValue(initialState, x)
 
     ###
 

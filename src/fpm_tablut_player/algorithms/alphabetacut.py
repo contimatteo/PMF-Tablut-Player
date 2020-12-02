@@ -1,6 +1,6 @@
 from fpm_tablut_player.libraries import GameTree, GameNode, GameState
 from fpm_tablut_player.utils import DebugUtils
-from fpm_tablut_player.heuristics import Heuristic, RandomHeuristic
+from fpm_tablut_player.heuristics import CustomHeuristic
 
 
 ###
@@ -9,13 +9,8 @@ from fpm_tablut_player.heuristics import Heuristic, RandomHeuristic
 class AlphaBetaCutAlgorithm():
     max: str = "white"
     min: str = "black"
-    heuristic: Heuristic
 
-    def __init__(self, type_heuristic: str):
-        if type_heuristic == "Random":
-            self.heuristic = RandomHeuristic()
-        else:  # default heuristic
-            self.heuristic = RandomHeuristic()
+    ###
 
     def __elaborateNodeValues(self, tree_with_heuristics: GameTree, initialState: GameState):
         node = tree_with_heuristics.root
@@ -46,16 +41,21 @@ class AlphaBetaCutAlgorithm():
 
                     #DebugUtils.info("     alpha: {} beta: {}",[alpha,beta])
                     x.parent.heuristic = beta
-                    if alpha is None:
-                        x.parent.numberChildren = x.parent.numberChildren - 1
-                    elif alpha >= beta:
+                    if alpha is not None and alpha >= beta:
                         #DebugUtils.info("parent is min => cancello a partire da {}",[(x.debugIndex+1)])
+                        if len(L) <= x.parent.numberChildren:
+                            DebugUtils.info("MIN CASE L {} CHILDREN {}", [
+                                            len(L), x.parent.numberChildren])
                         while x.parent.numberChildren > 0:  # remove all x.parent children
                             L.pop()
                             # Log.pop()
-                            x.parent.numberChildren = x.parent.numberChildren - 1
-                    L.pop()
-                    # Log.pop()
+                            x.parent.numberChildren -= 1
+                    else:
+                        # if len(L)<= x.parent.numberChildren:
+                        #    DebugUtils.info("MIN POP FUORI DAL WHILE L {} CH {}",[len(L),x.parent.numberChildren])
+                        x.parent.numberChildren -= 1
+                        L.pop()
+                        # Log.pop()
                 ##################################################################
                 else:  # parent is a max node
                     #DebugUtils.info("     parent is a max node",[])
@@ -70,16 +70,21 @@ class AlphaBetaCutAlgorithm():
 
                     #DebugUtils.info("     alpha: {} beta: {}",[alpha,beta])
                     x.parent.heuristic = alpha
-                    if beta is None:
-                        x.parent.heuristic = alpha
-                        x.parent.numberChildren = x.parent.numberChildren - 1
-                    elif alpha >= beta:
+
+                    if beta is not None and alpha >= beta:
                         #DebugUtils.info("parent is max => cancello a partire da {}",[x.debugIndex])
+                        if len(L) <= x.parent.numberChildren:
+                            DebugUtils.info("MAX CASE L {} CHILDREN {}", [
+                                            len(L), x.parent.numberChildren])
                         while x.parent.numberChildren > 0:  # remove all x.parent children
                             L.pop()
-                            x.parent.numberChildren = x.parent.numberChildren - 1
-                    L.pop()
-                    # Log.pop()
+                            x.parent.numberChildren -= 1
+                    else:
+                        # if len(L)<= x.parent.numberChildren:
+                        #    DebugUtils.info("MAX POP FUORI DAL WHILE L {} CH {}",[len(L),x.parent.numberChildren])
+                        x.parent.numberChildren -= 1
+                        L.pop()
+                        # Log.pop()
 
             ##################################################################
             else:
@@ -91,25 +96,25 @@ class AlphaBetaCutAlgorithm():
                     L = L+children
                     # for child in children:
                     #    Log=Log +[child.debugIndex]
-                else:  # leaf without heurisitc
-                    self.heuristic.assignValue(x, initialState)
+                else:
+                    # leaf without heurisitc
+                    CustomHeuristic.assignValue(initialState, x)
 
-    def getMorePromisingNode(self, tree_with_heuristics: GameTree, initialState: GameState) -> GameNode:
-        root = tree_with_heuristics.root
-        children = GameTree.getChildren(tree_with_heuristics.graph, root, False)
+    def getMorePromisingNode(self, search_tree: GameTree, initialState: GameState) -> GameNode:
+        root = search_tree.root
+        children = GameTree.getChildren(search_tree.graph, root, False)
 
         if len(children) == 0:
             return None
 
-        DebugUtils.info("AlphaBetaCutAlogorithm", [])
-        self.__elaborateNodeValues(tree_with_heuristics, initialState)
+        # DebugUtils.info("AlphaBetaCutAlogorithm", [])
+        self.__elaborateNodeValues(search_tree, initialState)
 
         heuristicValue = None
         bestNode = None
 
         for node in children:
-            DebugUtils.info("       next possible move {} value {}",
-                            [str(node.moves), node.heuristic])
+            #DebugUtils.info("       next possible move {} value {}",[str(node.moves), node.heuristic])
             if node.heuristic is not None:
                 if heuristicValue is None:
                     heuristicValue = node.heuristic
@@ -121,9 +126,8 @@ class AlphaBetaCutAlgorithm():
                     heuristicValue = node.heuristic
                     bestNode = node
 
-        DebugUtils.info("AlphaBetaCut best move is {} with value {}",
-                        [str(bestNode.moves), bestNode.heuristic])
-        DebugUtils.space()
+        #DebugUtils.info("AlphaBetaCut best move is {} with value {}", [str(bestNode.moves),bestNode.heuristic])
+        # DebugUtils.space()
         return bestNode
 
 #root=GameNode().initialize(None,"white", [],0)
