@@ -29,6 +29,7 @@ class GameState:
     def __init__(self):
         self.state = []
         self.turn = None
+        self.FinalDeaths = []
 
     ###
 
@@ -433,10 +434,6 @@ class GameState:
         # ...
 
         return self
-
-    def getKilled(self, initialGameState, moves) -> list:
-        TempGameState = GameState().createFromMoves(initialGameState, moves)
-        return TempGameState.FinalDeaths
 
     def createFromMoves(self, initialGameState, moves):
         endingGameState = copy.deepcopy(initialGameState)
