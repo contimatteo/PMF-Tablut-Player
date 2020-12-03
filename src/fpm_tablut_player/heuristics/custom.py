@@ -204,9 +204,9 @@ class CustomHeuristic():
 
         closedEscapeValue = 0
         closeEscapesInfoList = CustomHeuristic.__kingNearTheEscapes(currentState)
-        DebugUtils.info("ESCAPES:\n{}\n", [closeEscapesInfoList])
+        # DebugUtils.info("ESCAPES:\n{}\n", [closeEscapesInfoList])
         for escapeInfo in closeEscapesInfoList:
-            DebugUtils.info("THERE IS A CLOSE ESCAPE", [])
+            # DebugUtils.info("THERE IS A CLOSE ESCAPE", [])
             if escapeInfo["adjacent"] == True:
                 heuristicValue = MAX_HEURISITC_VALUE
                 break
@@ -267,7 +267,7 @@ class CustomHeuristic():
         closedEscapeValue = 0
         closeEscapesInfoList = CustomHeuristic.__kingNearTheEscapes(currentState)
         for escapeInfo in closeEscapesInfoList:
-            DebugUtils.info("ESCAPE: {}", [str(escapeInfo)])
+            # DebugUtils.info("ESCAPE: {}", [str(escapeInfo)])
             if escapeInfo["adjacent"] == True:
                 #DebugUtils.info("KING PROSSIMO AD USCIRE",[])
                 heuristicValue = MAX_HEURISITC_VALUE
@@ -284,16 +284,16 @@ class CustomHeuristic():
 
             kingDangerFactor = blacksClosedToKingInfo["closedBlack"] * \
                 blacksClosedToKingInfo["sumDistances"]
-            DebugUtils.info("WHITE: {}", [numberOfWhite])
-            DebugUtils.info("BLACK: {}", [numberOfBlack])
-            DebugUtils.info("KILL: {}", [numberOfkill])
-            DebugUtils.info("CLOSED ESCAPE VALUE: {}", [closedEscapeValue])
-            DebugUtils.info("KING IN DANGER FACTOR: {}", [kingDangerFactor])
-            DebugUtils.info("KING OBSTACLES {}", [kingObstacles])
+            # DebugUtils.info("WHITE: {}", [numberOfWhite])
+            # DebugUtils.info("BLACK: {}", [numberOfBlack])
+            # DebugUtils.info("KILL: {}", [numberOfkill])
+            # DebugUtils.info("CLOSED ESCAPE VALUE: {}", [closedEscapeValue])
+            # DebugUtils.info("KING IN DANGER FACTOR: {}", [kingDangerFactor])
+            # DebugUtils.info("KING OBSTACLES {}", [kingObstacles])
             heuristicValue = numberOfWhite-numberOfBlack+numberOfkill + \
                 closedEscapeValue-kingDangerFactor-kingObstacles
 
-        DebugUtils.info("HEURISTIC VALUE: {}", [heuristicValue])
+        # DebugUtils.info("HEURISTIC VALUE: {}", [heuristicValue])
         return heuristicValue
 
     ###
@@ -306,20 +306,20 @@ class CustomHeuristic():
 
         # #################################################################################
         # TODO: [@francesco] remove this ...
-        node.moves = [{'from': (4, 6), 'to': (2, 6)}]
-        board = [
-            ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "BLACK", "BLACK", "EMPTY", "EMPTY", "EMPTY"],
-            ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "BLACK", "EMPTY", "EMPTY"],
-            ["EMPTY", "EMPTY", "EMPTY", "BLACK", "WHITE", "EMPTY", "EMPTY", "WHITE", "EMPTY"],
-            ["BLACK", "EMPTY", "EMPTY", "EMPTY", "WHITE", "EMPTY", "EMPTY", "KING", "BLACK"],
-            ["BLACK", "BLACK", "EMPTY", "WHITE", "THRONE", "EMPTY", "WHITE", "BLACK", "BLACK"],
-            ["BLACK", "EMPTY", "EMPTY", "EMPTY", "WHITE", "EMPTY", "EMPTY", "EMPTY", "BLACK"],
-            ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "WHITE", "BLACK", "EMPTY", "EMPTY", "EMPTY"],
-            ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY"],
-            ["EMPTY", "EMPTY", "EMPTY", "BLACK", "BLACK", "EMPTY", "WHITE", "EMPTY", "EMPTY"],
-        ]
-        initialServerState = {"board": board, "turn": "WHITE"}
-        initialState = GameState().createFromServerState(initialServerState)
+        # node.moves = [{'from': (4, 6), 'to': (2, 6)}]
+        # board = [
+        #     ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "BLACK", "BLACK", "EMPTY", "EMPTY", "EMPTY"],
+        #     ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "BLACK", "EMPTY", "EMPTY"],
+        #     ["EMPTY", "EMPTY", "EMPTY", "BLACK", "WHITE", "EMPTY", "EMPTY", "WHITE", "EMPTY"],
+        #     ["BLACK", "EMPTY", "EMPTY", "EMPTY", "WHITE", "EMPTY", "EMPTY", "KING", "BLACK"],
+        #     ["BLACK", "BLACK", "EMPTY", "WHITE", "THRONE", "EMPTY", "WHITE", "BLACK", "BLACK"],
+        #     ["BLACK", "EMPTY", "EMPTY", "EMPTY", "WHITE", "EMPTY", "EMPTY", "EMPTY", "BLACK"],
+        #     ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "WHITE", "BLACK", "EMPTY", "EMPTY", "EMPTY"],
+        #     ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY"],
+        #     ["EMPTY", "EMPTY", "EMPTY", "BLACK", "BLACK", "EMPTY", "WHITE", "EMPTY", "EMPTY"],
+        # ]
+        # initialServerState = {"board": board, "turn": "WHITE"}
+        # initialState = GameState().createFromServerState(initialServerState)
         # #################################################################################
 
         try:
@@ -328,12 +328,14 @@ class CustomHeuristic():
 
             # #################################################################################
             # TODO: [@francesco] remove this ...
-            CustomHeuristic.__showGame(currentState.state)
-            currentState.turn = "white"
+            # CustomHeuristic.__showGame(currentState.state)
             # #################################################################################
 
             #
-            value = CustomHeuristic.__computeForWhite(currentState)
+            if currentState.turn == "white":
+                value = CustomHeuristic.__computeForWhite(currentState)
+            else:
+                value = CustomHeuristic.__computeForBlack(currentState)
         except Exception as error:
             if error.__class__.__name__ == "WhiteWinsException":
                 if my_player_role == "white":
