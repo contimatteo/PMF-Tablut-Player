@@ -85,15 +85,13 @@ $ fpm_tablut_player
 Black Player
 
 ```sh
-$ source venv/bin/activate
-$ fpm_tablut_player --role 'black' --timeout 60 --server '127.0.0.1'
+$ source venv/bin/activate && fpm_tablut_player --role 'black' --timeout 60 --server '127.0.0.1'
 ```
 
 White Player
 
 ```sh
-$ source venv/bin/activate
-$ fpm_tablut_player --role 'white' --timeout 60 --server '127.0.0.1'
+$ source venv/bin/activate && fpm_tablut_player --role 'white' --timeout 60 --server '127.0.0.1'
 ```
 
 <!-- ---------------------------------------------------------------------- -->
