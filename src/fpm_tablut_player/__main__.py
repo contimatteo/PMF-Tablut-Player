@@ -2,6 +2,7 @@
 
 import sys
 import argparse
+import multiprocessing
 
 import fpm_tablut_player.configs as CONFIGS
 from fpm_tablut_player.libraries import GameMultithread as Game
@@ -63,6 +64,7 @@ def __parse_args():
     DebugUtils.space()
     DebugUtils.info("ROLE         =  {}", [CONFIGS.APP_ROLE])
     DebugUtils.info("SERVER_PORT  =  {}", [CONFIGS.SERVER_PORT])
+    DebugUtils.info("CPU_COUNT    =  {}", [multiprocessing.cpu_count()])
     DebugUtils.space()
 
 
