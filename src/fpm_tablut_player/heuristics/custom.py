@@ -218,10 +218,15 @@ class CustomHeuristic():
             elif currentState.state[escapeInfo["mainPoint"]] == "BLACK" and escapeInfo["adjacent"] == True:
                 closedEscapeByBlack+=1
 
-        if CustomHeuristic.__kingPossibleWin(currentState) > 0:
+
+        infoPossibility =CustomHeuristic.__kingPossibleWin(currentState)
+
+        if infoPossibility["deaths"] > 0:
+            heuristicValue = MIN_HEURISITC_VALUE
+        elif infoPossibility["wins"] > 0:
             heuristicValue = MAX_HEURISITC_VALUE
 
-        if heuristicValue >= MAX_HEURISITC_VALUE:
+        if heuristicValue < MAX_HEURISITC_VALUE and heuristicValue > MIN_HEURISITC_VALUE:
 
             blackNearKing = 0
             for black in currentState.BlackList:
@@ -271,7 +276,14 @@ class CustomHeuristic():
         if nearestEstPoint is not None:
             pointToControl.append(nearestEstPoint)
 
+        possibleDeath = 0
+
+        print(pointToControl)
         for point in pointToControl:
+
+
+
+
             #left escape
             if (point[0],0) in ESCAPE_CELLS:
                 adjacent = CustomHeuristic.__computeNearstPositionForPoint(currentState,(point[0],0),point)["adjacent"]
@@ -279,23 +291,60 @@ class CustomHeuristic():
                     #nord obastacle
                     if CustomHeuristic.__isValidCoordinate((point[0]-1,point[1])) and ((point[0]-1,point[1]) in CAMP_CELLS or (point[0]-1,point[1]) == "BLACK"):
                         if CustomHeuristic.__isValidCoordinate((point[0]+1,point[1])):
-                            start = point[1]
-                            while start > 0:
-                                start-=1
-                                if currentState.state[(point[0]+1,start)] == "BLACK" or currentState.state[(point[0]+1,start)] == "THRONE":
-                                    start=0
-                                elif start-1 == 0:
-                                    possibleWins+=1
+                            for i in range(2):
+                                if i == 0:
+                                    start = point[1]
+                                    while start > 0:
+                                        start-=1
+                                        if currentState.state[(point[0],start)] == "BLACK" or currentState.state[(point[0]+1,start)] == "THRONE":
+                                            start=0
+                                        elif start-1 == 0:
+                                            possibleWins+=1
+                                else:
+                                    start = point[1]
+                                    while start < 8:
+                                        start+=1
+                                        if currentState.state[(point[0]+1,start)] != "EMPTY":
+                                            start = 8
+                                            if currentState.state[(point[0]+1,start)] == "BLACK":
+                                                possibleDeath+=1
+
+                                    start = point[1]
+                                    while start > 0:
+                                        start-=1
+                                        if currentState.state[(point[0]+1,start)] != "EMPTY":
+                                            start = 0
+                                            if currentState.state[(point[0]+1,start)] == "BLACK":
+                                                possibleDeath+=1
+
                     #sud obstacle
                     elif CustomHeuristic.__isValidCoordinate((point[0]+1,point[1])) and ((point[0]+1,point[1]) in CAMP_CELLS or (point[0]+1,point[1]) == "BLACK"):
                         if CustomHeuristic.__isValidCoordinate((point[0]-1,point[1])):
-                            start = point[1]
-                            while start > 0:
-                                start-=1
-                                if currentState.state[(point[0]-1,start)] == "BLACK" or currentState.state[(point[0]-1,start)] == "THRONE":
-                                    start=0
-                                elif start-1 == 0:
-                                    possibleWins+=1
+                            for i in range(2):
+                                if i == 0:
+                                    start = point[1]
+                                    while start > 0:
+                                        start-=1
+                                        if currentState.state[(point[0],start)] == "BLACK" or currentState.state[(point[0]-1,start)] == "THRONE":
+                                            start=0
+                                        elif start-1 == 0:
+                                            possibleWins+=1
+                                else:
+                                    start = point[1]
+                                    while start < 8:
+                                        start+=1
+                                        if currentState.state[(point[0]-1,start)]  != "EMPTY":
+                                            start = 8
+                                            if currentState.state[(point[0]-1,start)] == "BLACK":
+                                                possibleDeath+=1
+
+                                    start = point[1]
+                                    while start > 0:
+                                        start-=1
+                                        if currentState.state[(point[0]-1,start)]  != "EMPTY":
+                                            start = 0
+                                            if currentState.state[(point[0]-1,start)] == "BLACK":
+                                                possibleDeath+=1
             #right escape             
             if (point[0],8) in ESCAPE_CELLS:
                 adjacent = CustomHeuristic.__computeNearstPositionForPoint(currentState,(point[0],8),point)["adjacent"]
@@ -303,75 +352,191 @@ class CustomHeuristic():
                     #nord obstacle
                     if CustomHeuristic.__isValidCoordinate((point[0]-1,point[1])) and ((point[0]-1,point[1]) in CAMP_CELLS or (point[0]-1,point[1]) == "BLACK"):
                         if CustomHeuristic.__isValidCoordinate((point[0]+1,point[1])):
-                            start = point[1]
-                            while start < 8:
-                                start+=1
-                                if currentState.state[(point[0]+1,start)] == "BLACK" or currentState.state[(point[0]+1,start)] == "THRONE":
-                                    start=8
-                                elif start+1 == 8:
-                                    possibleWins+=1
+                            for i in range(2):
+                                if i == 0:
+                                    start = point[1]
+                                    while start < 8:
+                                        start+=1
+                                        if currentState.state[(point[0],start)] == "BLACK" or currentState.state[(point[0]+1,start)] == "THRONE":
+                                            start=8
+                                        elif start+1 == 8:
+                                            possibleWins+=1
+                                else:
+                                    start = point[1]
+                                    while start > 0:
+                                        start-=1
+                                        if currentState.state[(point[0]+1,start)] != "EMPTY":
+                                            start = 0
+                                            if currentState.state[(point[0]+1,start)] == "BLACK":
+                                                possibleDeath+=1
+
+                                    start = point[1]
+                                    while start < 8:
+                                        start+=1
+                                        if currentState.state[(point[0]+1,start)] != "EMPTY":
+                                            start = 8
+                                            if currentState.state[(point[0]+1,start)] == "BLACK":
+                                                possibleDeath+=1
+
                     #sud obstacle
                     elif CustomHeuristic.__isValidCoordinate((point[0]+1,point[1])) and ((point[0]+1,point[1]) in CAMP_CELLS or (point[0]+1,point[1]) == "BLACK"):
                         if CustomHeuristic.__isValidCoordinate((point[0]-1,point[1])):
-                            start = point[1]
-                            while start < 8:
-                                start+=1
-                                if currentState.state[(point[0]-1,start)] == "BLACK" or currentState.state[(point[0]-1,start)] == "THRONE":
-                                    start=8
-                                elif start+1 == 8:
-                                    possibleWins+=1
+                            for i in range(2):
+                                if i == 0:
+                                    start = point[1]
+                                    while start < 8:
+                                        start+=1
+                                        if currentState.state[(point[0],start)] == "BLACK" or currentState.state[(point[0]-1,start)] == "THRONE":
+                                            start=8
+                                        elif start+1 == 8:
+                                            possibleWins+=1
+                                else:
+                                    start = point[1]
+                                    while start > 0:
+                                        start-=1
+                                        if currentState.state[(point[0]-1,start)] != "EMPTY":
+                                            start = 0
+                                            if currentState.state[(point[0]-1,start)] == "BLACK" or currentState.state[(point[0]-1,start)] == "THRONE":
+                                                possibleDeath+=1
+                                    
+                                    start = point[1]
+                                    while start < 8:
+                                        start+=1
+                                        if currentState.state[(point[0]-1,start)] != "EMPTY":
+                                            start = 8
+                                            if currentState.state[(point[0]-1,start)] == "BLACK":
+                                                possibleDeath+=1
 
             #up escape             
             if (0,point[1]) in ESCAPE_CELLS:
+                print("ESCAPE CELL")
                 adjacent = CustomHeuristic.__computeNearstPositionForPoint(currentState,(0,point[1]),point)["adjacent"]
                 if adjacent == True:
+                    print("PUO ANDARE")
                     #left obstacle
                     if CustomHeuristic.__isValidCoordinate((point[0],point[1]-1)) and ((point[0],point[1]-1) in CAMP_CELLS or (point[0],point[1]-1) == "BLACK"):
                         if CustomHeuristic.__isValidCoordinate((point[0],point[1]+1)):
-                            start = point[0]
-                            while start > 0:
-                                start-=1
-                                if currentState.state[(start,point[1])] == "BLACK" or currentState.state[(start,point[1])] == "THRONE":
-                                    start=0
-                                elif start-1 == 0:
-                                    possibleWins+=1
+                            for i in range(2):
+                                if i == 0:
+                                    start = point[0]
+                                    while start > 0:
+                                        start-=1
+                                        if currentState.state[(start,point[1])] == "BLACK" or currentState.state[(start,point[1])] == "THRONE":
+                                            start=0
+                                        elif start-1 == 0:
+                                            possibleWins+=1
+                                else:
+                                    start = point[0]
+                                    while start < 8:
+                                        start+=1
+                                        if currentState.state[(start,point[1]+1)] != "EMPTY":
+                                            start = 8
+                                            if currentState.state[(start,point[1]+1)] == "BLACK":
+                                                possibleDeath+=1
+
+                                    start = point[0]
+                                    while start > 0:
+                                        start-=1
+                                        if currentState.state[(start,point[1]+1)] != "EMPTY":
+                                            start = 0
+                                            if currentState.state[(start,point[1]+1)] == "BLACK":
+                                                possibleDeath+=1
                     #right obstacle
                     elif CustomHeuristic.__isValidCoordinate((point[0],point[1]+1)) and ((point[0],point[1]+1) in CAMP_CELLS or (point[0],point[1]+1) == "BLACK"):
                         if CustomHeuristic.__isValidCoordinate((point[0],point[1]-1)):
-                            start = point[0]
-                            while start > 0:
-                                start-=1
-                                if currentState.state[(start,point[1])] == "BLACK" or currentState.state[(start,point[1])] == "THRONE":
-                                    start=0
-                                elif start-1 == 0:
-                                    possibleWins+=1
+                            for i in range(2):
+                                if i == 0:
+                                    start = point[0]
+                                    while start > 0:
+                                        start-=1
+                                        if currentState.state[(start,point[1])] == "BLACK" or currentState.state[(start,point[1])] == "THRONE":
+                                            start=0
+                                        elif start-1 == 0:
+                                            possibleWins+=1
+                                else:
+                                    start = point[0]
+                                    while start < 8:
+                                        start+=1
+                                        if currentState.state[(start,point[1]-1)] != "EMPTY":
+                                            start = 8
+                                            if currentState.state[(start,point[1]-1)] == "BLACK":
+                                                possibleDeath+=1
+
+                                    start = point[0]
+                                    while start > 0:
+                                        start-=1
+                                        if currentState.state[(start,point[1]-1)] != "EMPTY":
+                                            start = 0
+                                            if currentState.state[(start,point[1]-1)] == "BLACK":
+                                                possibleDeath+=1
 
 
             #down escape             
             if (8,point[1]) in ESCAPE_CELLS:
+                print("ESCAPE CELL")
                 adjacent = CustomHeuristic.__computeNearstPositionForPoint(currentState,(8,point[1]),point)["adjacent"]
                 if adjacent == True:
+                    print("PUO ANDARE")
                     #left obstacle
                     if CustomHeuristic.__isValidCoordinate((point[0],point[1]-1)) and ((point[0],point[1]-1) in CAMP_CELLS or (point[0],point[1]-1) == "BLACK"):
                         if CustomHeuristic.__isValidCoordinate((point[0],point[1]+1)):
-                            start = point[0]
-                            while start < 8:
-                                start+=1
-                                if currentState.state[(start,point[1])] == "BLACK" or currentState.state[(start,point[1])] == "THRONE":
-                                    start=8
-                                elif start+1 == 8:
-                                    possibleWins+=1
+                            for i in range(2):
+                                if i == 0:
+                                    start = point[0]
+                                    while start < 8:
+                                        start+=1
+                                        if currentState.state[(start,point[1])] == "BLACK" or currentState.state[(start,point[1])] == "THRONE":
+                                            start=8
+                                        elif start+1 == 8:
+                                            possibleWins+=1
+                                else:
+                                    start = point[0]
+                                    while start > 0:
+                                        start-=1
+                                        if currentState.state[(start,point[1]+1)] != "EMPTY":
+                                            start = 0
+                                            if currentState.state[(start,point[1]+1)] == "BLACK":
+                                                possibleDeath+=1
+
+                                    start = point[0]
+                                    while start < 8:
+                                        start+=1
+                                        if currentState.state[(start,point[1]+1)] != "EMPTY":
+                                            start=8
+                                            if currentState.state[(start,point[1]+1)] == "BLACK":
+                                                possibleDeath+=1
                     #right obstacle
                     elif CustomHeuristic.__isValidCoordinate((point[0],point[1]+1)) and ((point[0],point[1]+1) in CAMP_CELLS or (point[0],point[1]+1) == "BLACK"):
                         if CustomHeuristic.__isValidCoordinate((point[0],point[1]-1)):
-                            start = point[0]
-                            while start < 8:
-                                start+=1
-                                if currentState.state[(start,point[1])] == "BLACK" or currentState.state[(start,point[1])] == "THRONE":
-                                    start=0
-                                elif start+1 == 8:
-                                    possibleWins+=1
-        return possibleWins
+                            for i in range(2):
+                                if i == 0:
+                                    start = point[0]
+                                    while start < 8:
+                                        start+=1
+                                        if currentState.state[(start,point[1])] == "BLACK" or currentState.state[(start,point[1])] == "THRONE":
+                                            start=0
+                                        elif start+1 == 8:
+                                            possibleWins+=1
+                                else:
+                                    start = point[0]
+                                    while start > 0:
+                                        start-=1
+                                        if currentState.state[(start,point[1]-1)] != "EMPTY":
+                                            start=0
+                                            if currentState.state[(start,point[1]-1)] == "BLACK":
+                                                possibleDeath+=1
+
+                                    start = point[0]
+                                    while start < 8:
+                                        start+=1
+                                        if currentState.state[(start,point[1]-1)] != "EMPTY":
+                                            start=8
+                                            if currentState.state[(start,point[1]-1)] == "BLACK":
+                                                possibleDeath+=1
+
+                                    
+
+        return {"wins": possibleWins, "deaths": possibleDeath}
 
     @staticmethod
     def __isValidCoordinate(point: tuple):
@@ -426,11 +591,14 @@ class CustomHeuristic():
                 elif escapeInfo["distance"] > 0:
                     closedEscapeValue += (9-escapeInfo["distance"])
 
-
-        if CustomHeuristic.__kingPossibleWin(currentState) > 0:
+        infoPossibility =CustomHeuristic.__kingPossibleWin(currentState)
+        
+        if infoPossibility["deaths"] > 0:
+            heuristicValue = MIN_HEURISITC_VALUE
+        elif infoPossibility["wins"] > 0:
             heuristicValue = MAX_HEURISITC_VALUE
 
-        if heuristicValue < MAX_HEURISITC_VALUE:
+        if heuristicValue < MAX_HEURISITC_VALUE and heuristicValue > MIN_HEURISITC_VALUE:
 
             blackNearKing = 0
             for black in currentState.BlackList:
@@ -518,15 +686,15 @@ class CustomHeuristic():
 
     @staticmethod
     def assignValue(initialState: GameState, node: GameNode):
-         board = [["EMPTY", "EMPTY", "EMPTY", "EMPTY", "BLACK", "BLACK", "BLACK", "EMPTY", "EMPTY"],
+         board = [["EMPTY", "EMPTY", "EMPTY", "EMPTY", "BLACK", "BLACK", "EMPTY", "EMPTY", "EMPTY"],
+                  ["EMPTY", "EMPTY", "BLACK", "EMPTY", "WHITE", "BLACK", "EMPTY", "EMPTY", "EMPTY"],
                   ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY"],
-                  ["EMPTY", "EMPTY", "EMPTY", "BLACK", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY"],
-                  ["BLACK", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "BLACK"],
-                  ["BLACK", "BLACK", "WHITE", "WHITE", "KING", "WHITE", "WHITE", "BLACK", "BLACK"],
+                  ["BLACK", "WHITE", "EMPTY", "BLACK", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "BLACK"],
+                  ["BLACK", "BLACK", "EMPTY", "EMPTY", "KING", "WHITE", "WHITE", "BLACK", "BLACK"],
                   ["BLACK", "EMPTY", "EMPTY", "EMPTY", "WHITE", "EMPTY", "EMPTY", "EMPTY", "BLACK"],
                   ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "WHITE", "WHITE", "EMPTY", "EMPTY", "EMPTY"],
-                  ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "BLACK", "WHITE", "EMPTY", "EMPTY", "EMPTY"],
-                  ["EMPTY", "EMPTY", "EMPTY", "BLACK", "BLACK", "BLACK", "EMPTY", "EMPTY", "EMPTY"],
+                  ["BLACK", "EMPTY", "EMPTY", "EMPTY", "BLACK", "WHITE", "EMPTY", "EMPTY", "EMPTY"],
+                  ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "BLACK", "BLACK", "EMPTY", "EMPTY", "EMPTY"],
                   ]
 
          initialServerState = {"board": board, "turn": "WHITE"}
