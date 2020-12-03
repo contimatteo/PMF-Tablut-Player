@@ -100,7 +100,7 @@ class CustomHeuristic():
         escapeInfoList = []
 
         for escape in ESCAPE_CELLS:
-            if currentState.state[escape] == "EMPTY" and (escape[0] == king[0] or escape[1] == king[1]):
+            if escape[0] == king[0] or escape[1] == king[1]:
                 info = CustomHeuristic.__computeNearstPositionForPoint(currentState, escape, king)
                 escapeInfoList.append(info)
 
@@ -116,8 +116,8 @@ class CustomHeuristic():
                     currentState, black, currentState.King)
                 if info["adjacent"] == True:
                     numberOfBlack += 1
-                else:
-                    distanceSum += info["distance"]
+                #else:
+                #    distanceSum += info["distance"]
         return {"closedBlack": numberOfBlack, "sumDistances": distanceSum}
 
     @staticmethod
@@ -203,29 +203,34 @@ class CustomHeuristic():
         heuristicValue = 0
 
         closedEscapeValue = 0
+        closedEscapeByBlack = 0
+
         closeEscapesInfoList = CustomHeuristic.__kingNearTheEscapes(currentState)
         # DebugUtils.info("ESCAPES:\n{}\n", [closeEscapesInfoList])
         for escapeInfo in closeEscapesInfoList:
-            # DebugUtils.info("THERE IS A CLOSE ESCAPE", [])
-            if escapeInfo["adjacent"] == True:
-                heuristicValue = MAX_HEURISITC_VALUE
-                break
-            else:
-                closedEscapeValue += (9-escapeInfo["distance"])
+            if currentState.state[escapeInfo["mainPoint"]] == "EMPTY":
+                if escapeInfo["adjacent"] == True:
+                    #DebugUtils.info("KING PROSSIMO AD USCIRE",[])
+                    heuristicValue = MAX_HEURISITC_VALUE
+                    break
+                elif escapeInfo["distance"] > 0:
+                    closedEscapeValue += (9-escapeInfo["distance"])
+            elif currentState.state[escapeInfo["mainPoint"]] == "BLACK" and escapeInfo["adjacent"] == True:
+                closedEscapeByBlack+=1
 
         if heuristicValue >= MAX_HEURISITC_VALUE:
             numberOfBlack = CustomHeuristic.__getPlayableEnemyPawns(currentState)
             numberOfWhite = CustomHeuristic.__getPlayablePawns(currentState)
             numberOfkill = CustomHeuristic.__getNumberOfKills(currentState)
-            kingObstacles = CustomHeuristic.__PawnsNearTheKing(currentState)["obstacle"]
+            neighboursKing = CustomHeuristic.__PawnsNearTheKing(currentState)
+            kingObstacles = neighboursKing["obstacle"]+neighboursKing["black"]
             blacksClosedToKingInfo = CustomHeuristic.__BlacksCloseToTheKing(currentState)
 
-            kingDangerFactor = blacksClosedToKingInfo["closedBlack"] * \
-                blacksClosedToKingInfo["sumDistances"]
+            kingDangerFactor = blacksClosedToKingInfo["closedBlack"]
 
             heuristicValue = numberOfBlack-numberOfWhite+numberOfkill - \
-                closedEscapeValue+kingDangerFactor+kingObstacles
-        return heuristicValue
+                closedEscapeValue+kingDangerFactor+kingObstacles+closedEscapeByBlack
+        return (-1) * heuristicValue
 
     @staticmethod
     def __computeForWhite(currentState: GameState) -> int:
@@ -268,12 +273,13 @@ class CustomHeuristic():
         closeEscapesInfoList = CustomHeuristic.__kingNearTheEscapes(currentState)
         for escapeInfo in closeEscapesInfoList:
             # DebugUtils.info("ESCAPE: {}", [str(escapeInfo)])
-            if escapeInfo["adjacent"] == True:
-                #DebugUtils.info("KING PROSSIMO AD USCIRE",[])
-                heuristicValue = MAX_HEURISITC_VALUE
-                break
-            elif escapeInfo["distance"] > 0:
-                closedEscapeValue += (9-escapeInfo["distance"])
+            if currentState.state[escapeInfo["mainPoint"]] == "EMPTY":
+                if escapeInfo["adjacent"] == True:
+                    #DebugUtils.info("KING PROSSIMO AD USCIRE",[])
+                    heuristicValue = MAX_HEURISITC_VALUE
+                    break
+                elif escapeInfo["distance"] > 0:
+                    closedEscapeValue += (9-escapeInfo["distance"])
 
         if heuristicValue < MAX_HEURISITC_VALUE:
             numberOfBlack = CustomHeuristic.__getPlayableEnemyPawns(currentState)
@@ -282,8 +288,7 @@ class CustomHeuristic():
             kingObstacles = CustomHeuristic.__PawnsNearTheKing(currentState)["obstacle"]
             blacksClosedToKingInfo = CustomHeuristic.__BlacksCloseToTheKing(currentState)
 
-            kingDangerFactor = blacksClosedToKingInfo["closedBlack"] * \
-                blacksClosedToKingInfo["sumDistances"]
+            kingDangerFactor = blacksClosedToKingInfo["closedBlack"]
             # DebugUtils.info("WHITE: {}", [numberOfWhite])
             # DebugUtils.info("BLACK: {}", [numberOfBlack])
             # DebugUtils.info("KILL: {}", [numberOfkill])
@@ -338,15 +343,15 @@ class CustomHeuristic():
                 value = CustomHeuristic.__computeForBlack(currentState)
         except Exception as error:
             if error.__class__.__name__ == "WhiteWinsException":
-                if my_player_role == "white":
-                    value = MAX_HEURISITC_VALUE
-                else:
-                    value = MIN_HEURISITC_VALUE
+                #if my_player_role == "white":
+                value = MAX_HEURISITC_VALUE
+                #else:
+                #    value = MIN_HEURISITC_VALUE
             elif error.__class__.__name__ == "BlackWinsException":
-                if my_player_role == "white":
-                    value = MIN_HEURISITC_VALUE
-                else:
-                    value = MAX_HEURISITC_VALUE
+                #if my_player_role == "white":
+                value = MIN_HEURISITC_VALUE
+                #else:
+                #    value = MAX_HEURISITC_VALUE
             else:
                 value = 0
 
