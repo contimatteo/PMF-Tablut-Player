@@ -11,6 +11,8 @@ from fpm_tablut_player.utils import DebugUtils, GameUtils
 ESCAPE_CELLS: list = GameUtils.getEscapeCells()
 CAMP_CELLS: list = GameUtils.getCampCells()
 THRONE_CELL: tuple = (GameUtils.getThroneCells())[0]
+MAX_HEURISITC_VALUE: int = 1000000
+MIN_HEURISITC_VALUE: int = -1000000
 
 ###
 
@@ -31,57 +33,63 @@ class CustomHeuristic():
         return found
 
     @staticmethod
-    def __computeNearstPositionForEscape(currentState: GameState, escape: tuple, point: tuple) -> dict:
+    def __computeNearstPositionForPoint(currentState: GameState, mainPoint: tuple, point: tuple) -> dict:
         distance = 0
         nearestPoint = None
         info = {}
 
-        if escape[0] == point[0]:
+        if mainPoint[0] == point[0]:
             direction = "positive"
-            if point[1] > escape[1]:
+            if point[1] > mainPoint[1]:
                 direction = "negative"
-            offset = abs(point[1]-escape[1])-1
-            for i in range(offset):
-                if direction == "positive":
-                    if currentState.state[(escape[0], point[1]+(i+1))] == "EMPTY":
-                        distance += 1
-                        nearestPoint = (escape[0], point[1]+(i+1))
+            offset = abs(point[1]-mainPoint[1])-1
+            if offset == 0:
+                nearestPoint = point
+            else:
+                for i in range(offset):
+                    if direction == "positive":
+                        if currentState.state[(mainPoint[0], point[1]+(i+1))] == "EMPTY":
+                            distance += 1
+                            nearestPoint = (mainPoint[0], point[1]+(i+1))
+                        else:
+                            break
                     else:
-                        break
-                else:
-                    if currentState.state[(escape[0], point[1]-(i+1))] == "EMPTY":
-                        distance += 1
-                        nearestPoint = (escape[0], point[1]-(i+1))
-                    else:
-                        break
+                        if currentState.state[(mainPoint[0], point[1]-(i+1))] == "EMPTY":
+                            distance += 1
+                            nearestPoint = (mainPoint[0], point[1]-(i+1))
+                        else:
+                            break
 
-        elif escape[1] == point[1]:
+        elif mainPoint[1] == point[1]:
             direction = "positive"
-            if point[0] > escape[0]:
+            if point[0] > mainPoint[0]:
                 direction = "negative"
-            offset = abs(point[0]-escape[0])-1
-            for i in range(offset):
-                if direction == "positive":
-                    if currentState.state[(point[0]+(i+1), escape[1])] == "EMPTY":
-                        distance += 1
-                        nearestPoint = (point[0]+(i+1), escape[1])
+            offset = abs(point[0]-mainPoint[0])-1
+            if offset == 0:
+                nearestPoint = point
+            else:
+                for i in range(offset):
+                    if direction == "positive":
+                        if currentState.state[(point[0]+(i+1), mainPoint[1])] == "EMPTY":
+                            distance += 1
+                            nearestPoint = (point[0]+(i+1), mainPoint[1])
+                        else:
+                            break
                     else:
-                        break
-                else:
-                    if currentState.state[(point[0]-(i+1), escape[1])] == "EMPTY":
-                        distance += 1
-                        nearestPoint = (point[0]-(i+1), escape[1])
-                    else:
-                        break
-        info["escape"] = escape
+                        if currentState.state[(point[0]-(i+1), mainPoint[1])] == "EMPTY":
+                            distance += 1
+                            nearestPoint = (point[0]-(i+1), mainPoint[1])
+                        else:
+                            break
+        info["mainPoint"] = mainPoint
         info["distance"] = distance
         info["nearestPoint"] = nearestPoint
 
         info["adjacent"] = False
 
-        if nearestPoint is not None and escape[0] == point[0] and (escape[1] == nearestPoint[1]+1 or escape[1] == nearestPoint[1]-1):
+        if nearestPoint is not None and mainPoint[0] == point[0] and (mainPoint[1] == nearestPoint[1]+1 or mainPoint[1] == nearestPoint[1]-1):
             info["adjacent"] = True
-        elif nearestPoint is not None and escape[1] == point[1] and (escape[0] == nearestPoint[0]+1 or escape[0] == nearestPoint[0]-1):
+        elif nearestPoint is not None and mainPoint[1] == point[1] and (mainPoint[0] == nearestPoint[0]+1 or mainPoint[0] == nearestPoint[0]-1):
             info["adjacent"] = True
         return info
 
@@ -92,17 +100,36 @@ class CustomHeuristic():
         escapeInfoList = []
 
         for escape in ESCAPE_CELLS:
-            if escape[0] == king[0] or escape[1] == king[1]:
-                info = CustomHeuristic.__computeNearstPositionForEscape(currentState, escape, king)
+            if currentState.state[escape] == "EMPTY" and (escape[0] == king[0] or escape[1] == king[1]):
+                info = CustomHeuristic.__computeNearstPositionForPoint(currentState, escape, king)
                 escapeInfoList.append(info)
 
         return escapeInfoList
+
+    @staticmethod
+    def __BlacksCloseToTheKing(currentState: GameState):
+        numberOfBlack=0
+        distanceSum = 0
+        for black in currentState.BlackList:
+            if currentState.King[0] == black[0] or currentState.King[1] == black[1]:
+                info=CustomHeuristic.__computeNearstPositionForPoint(currentState,black,currentState.King)
+                if info["adjacent"] == True:
+                    numberOfBlack+=1
+                else:
+                    distanceSum+=info["distance"]
+        return {"closedBlack": numberOfBlack, "sumDistances": distanceSum}
 
     @staticmethod
     def __getPlayablePawns(currentState: GameState) -> int:
         if currentState.turn == "black":
             return currentState.BlackNumber
         return currentState.WhiteNumber
+
+    @staticmethod
+    def __getPlayableEnemyPawns(currentState: GameState) -> int:
+        if currentState.turn == "black":
+            return currentState.WhiteNumber
+        return currentState.BlackNumber
 
     @staticmethod
     def __computeNeighbour(currentState: GameState, neighbourood: dict, coordinate: tuple):
@@ -135,13 +162,6 @@ class CustomHeuristic():
     @staticmethod
     def __getNumberOfKills(currentState: GameState) -> int:
         return len(currentState.FinalDeaths)
-
-    @staticmethod
-    def __computeForBlack(currentState: GameState):
-        #
-        # TODO: missing ...
-        #
-        pass
 
     @staticmethod
     def __showGame(board):
@@ -178,37 +198,100 @@ class CustomHeuristic():
         DebugUtils.space()
 
     @staticmethod
-    def __computeForWhite(currentState: GameState):
+    def __computeForBlack(currentState: GameState) -> int:
+        heuristicValue=0
 
-        DebugUtils.info("HEURISTIC DATA FOR {}", [currentState.turn.upper()])
-        DebugUtils.space()
-        DebugUtils.space()
 
-        DebugUtils.info("PLAYABLE PAWNS: {}", [CustomHeuristic.__getPlayablePawns(currentState)])
-        DebugUtils.info("KILL: {}", [CustomHeuristic.__getNumberOfKills(currentState)])
-        DebugUtils.space()
-
-        kingNeighbour = CustomHeuristic.__PawnsNearTheKing(currentState)
-
-        DebugUtils.info("KING DATA {}:", [currentState.King])
-        DebugUtils.info("   => NEIGHBOUROOD:", [])
-        DebugUtils.space()
-        DebugUtils.info("       => BLACK: {}", [kingNeighbour["black"]])
-        DebugUtils.info("       => WHITE: {}", [kingNeighbour["white"]])
-        DebugUtils.info("       => ESCAPE: {}", [kingNeighbour["escape"]])
-        DebugUtils.info("       => OBSTACLE: {}", [kingNeighbour["obstacle"]])
-
-        DebugUtils.space()
-        DebugUtils.info("   => CLOSING ESCAPE INFO :", [])
-
+        closedEscapeValue=0
         closeEscapesInfoList = CustomHeuristic.__kingNearTheEscapes(currentState)
-
+        DebugUtils.info("ESCAPES:\n{}\n",[closeEscapesInfoList])
         for escapeInfo in closeEscapesInfoList:
-            DebugUtils.space()
-            DebugUtils.info("       => ESCAPE {}", [escapeInfo["escape"]])
-            DebugUtils.info("           => DISTANCE {}", [escapeInfo["distance"]])
-            DebugUtils.info("           => NEAREST SHIFT {}", [escapeInfo["nearestPoint"]])
-            DebugUtils.info("           => NEAREST SHIFT IS ADJACENT {}", [escapeInfo["adjacent"]])
+            DebugUtils.info("THERE IS A CLOSE ESCAPE",[])
+            if escapeInfo["adjacent"] == True:
+                heuristicValue = MAX_HEURISITC_VALUE
+                break
+            else:
+                closedEscapeValue+=(9-escapeInfo["distance"])
+
+        if heuristicValue >= MAX_HEURISITC_VALUE:
+            numberOfBlack = CustomHeuristic.__getPlayableEnemyPawns(currentState)
+            numberOfWhite = CustomHeuristic.__getPlayablePawns(currentState)
+            numberOfkill = CustomHeuristic.__getNumberOfKills(currentState)
+            kingObstacles = CustomHeuristic.__PawnsNearTheKing(currentState)["obstacle"]
+            blacksClosedToKingInfo = CustomHeuristic.__BlacksCloseToTheKing(currentState)
+
+            kingDangerFactor = blacksClosedToKingInfo["closedBlack"] * blacksClosedToKingInfo["sumDistances"]
+
+            heuristicValue = numberOfBlack-numberOfWhite+numberOfkill-closedEscapeValue+kingDangerFactor+kingObstacles
+        return heuristicValue
+
+    @staticmethod
+    def __computeForWhite(currentState: GameState) -> int:
+
+        # DebugUtils.info("HEURISTIC DATA FOR {}", [currentState.turn.upper()])
+        # DebugUtils.space()
+        # DebugUtils.space()
+        #
+        # DebugUtils.info("PLAYABLE PAWNS: {}", [CustomHeuristic.__getPlayablePawns(currentState)])
+        # DebugUtils.info("KILL: {}", [CustomHeuristic.__getNumberOfKills(currentState)])
+        # DebugUtils.space()
+        #
+        # kingNeighbour = CustomHeuristic.__PawnsNearTheKing(currentState)
+        # blacksClosed = CustomHeuristic.__BlacksCloseToTheKing(currentState)
+        #
+        # DebugUtils.info("KING DATA {}:", [currentState.King])
+        # DebugUtils.info("   => CLOSED BLACKS: {}",[blacksClosed])
+        # DebugUtils.info("   => NEIGHBOUROOD:", [])
+        # DebugUtils.space()
+        # DebugUtils.info("       => BLACK: {}", [kingNeighbour["black"]])
+        # DebugUtils.info("       => WHITE: {}", [kingNeighbour["white"]])
+        # DebugUtils.info("       => ESCAPE: {}", [kingNeighbour["escape"]])
+        # DebugUtils.info("       => OBSTACLE: {}", [kingNeighbour["obstacle"]])
+        #
+        # DebugUtils.space()
+        # DebugUtils.info("   => CLOSING ESCAPE INFO :", [])
+        #
+        # closeEscapesInfoList = CustomHeuristic.__kingNearTheEscapes(currentState)
+        #
+        # for escapeInfo in closeEscapesInfoList:
+        #     DebugUtils.space()
+        #     DebugUtils.info("       => ESCAPE {}", [escapeInfo["mainPoint"]])
+        #     DebugUtils.info("           => DISTANCE {}", [escapeInfo["distance"]])
+        #     DebugUtils.info("           => NEAREST SHIFT {}", [escapeInfo["nearestPoint"]])
+        #     DebugUtils.info("           => NEAREST SHIFT IS ADJACENT {}", [escapeInfo["adjacent"]])
+
+        heuristicValue=0
+
+
+        closedEscapeValue=0
+        closeEscapesInfoList = CustomHeuristic.__kingNearTheEscapes(currentState)
+        for escapeInfo in closeEscapesInfoList:
+            DebugUtils.info("ESCAPE: {}",[str(escapeInfo)])
+            if escapeInfo["adjacent"] == True:
+                #DebugUtils.info("KING PROSSIMO AD USCIRE",[])
+                heuristicValue = MAX_HEURISITC_VALUE
+                break
+            elif escapeInfo["distance"] > 0:
+                closedEscapeValue+=(9-escapeInfo["distance"])
+
+        if heuristicValue < MAX_HEURISITC_VALUE:
+            numberOfBlack = CustomHeuristic.__getPlayableEnemyPawns(currentState)
+            numberOfWhite = CustomHeuristic.__getPlayablePawns(currentState)
+            numberOfkill = CustomHeuristic.__getNumberOfKills(currentState)
+            kingObstacles = CustomHeuristic.__PawnsNearTheKing(currentState)["obstacle"]
+            blacksClosedToKingInfo = CustomHeuristic.__BlacksCloseToTheKing(currentState)
+
+            kingDangerFactor = blacksClosedToKingInfo["closedBlack"] * blacksClosedToKingInfo["sumDistances"]
+            DebugUtils.info("WHITE: {}",[numberOfWhite])
+            DebugUtils.info("BLACK: {}",[numberOfBlack])
+            DebugUtils.info("KILL: {}",[numberOfkill])
+            DebugUtils.info("CLOSED ESCAPE VALUE: {}",[closedEscapeValue])
+            DebugUtils.info("KING IN DANGER FACTOR: {}",[kingDangerFactor])
+            DebugUtils.info("KING OBSTACLES {}",[kingObstacles])
+            heuristicValue = numberOfWhite-numberOfBlack+numberOfkill+closedEscapeValue-kingDangerFactor-kingObstacles
+        
+        DebugUtils.info("HEURISTIC VALUE: {}",[heuristicValue])
+        return heuristicValue
 
     ###
 
@@ -242,22 +325,17 @@ class CustomHeuristic():
     #     node.heuristic = value
 
     @staticmethod
-    def assignValue(initialState: GameState, node: GameNode, deb: int):
-        traceback.print_stack()
-        DebugUtils.space()
-        DebugUtils.space()
-        DebugUtils.space()
-        DebugUtils.space()
-        DebugUtils.info("DEBUG: {}", [deb])
+    def assignValue(initialState: GameState, node: GameNode):
+
         board = [["EMPTY", "EMPTY", "EMPTY", "EMPTY", "BLACK", "BLACK", "EMPTY", "EMPTY", "EMPTY"],
-                 ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY"],
-                 ["EMPTY", "EMPTY", "EMPTY", "BLACK", "WHITE", "BLACK", "EMPTY", "EMPTY", "EMPTY"],
+                 ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "BLACK", "EMPTY", "EMPTY"],
+                 ["EMPTY", "EMPTY", "EMPTY", "BLACK", "WHITE", "EMPTY", "EMPTY", "WHITE", "EMPTY"],
+                 ["BLACK", "EMPTY", "EMPTY", "EMPTY", "WHITE", "EMPTY", "EMPTY", "KING", "BLACK"],
+                 ["BLACK", "BLACK", "EMPTY", "WHITE", "THRONE","EMPTY", "WHITE", "BLACK", "BLACK"],
                  ["BLACK", "EMPTY", "EMPTY", "EMPTY", "WHITE", "EMPTY", "EMPTY", "EMPTY", "BLACK"],
-                 ["BLACK", "BLACK", "WHITE", "WHITE", "THRONE", "WHITE", "WHITE", "BLACK", "BLACK"],
-                 ["BLACK", "EMPTY", "EMPTY", "EMPTY", "WHITE", "KING", "EMPTY", "EMPTY", "BLACK"],
-                 ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "WHITE", "EMPTY", "EMPTY", "EMPTY", "EMPTY"],
-                 ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "BLACK", "EMPTY", "EMPTY", "EMPTY", "EMPTY"],
-                 ["EMPTY", "EMPTY", "EMPTY", "BLACK", "BLACK", "BLACK", "EMPTY", "EMPTY", "EMPTY"],
+                 ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "WHITE", "BLACK", "EMPTY", "EMPTY", "EMPTY"],
+                 ["EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY"],
+                 ["EMPTY", "EMPTY", "EMPTY", "BLACK", "BLACK", "EMPTY", "WHITE", "EMPTY", "EMPTY"],
                  ]
 
         initialServerState = {"board": board, "turn": "WHITE"}
@@ -274,16 +352,13 @@ class CustomHeuristic():
         CustomHeuristic.__showGame(currentState.state)
         currentState.turn = "white"
         CustomHeuristic.__computeForWhite(currentState)
-        DebugUtils.space()
-        DebugUtils.space()
-        DebugUtils.info("-------_____-------------______", [])
 
         #currentState = GameState().createFromMoves(initialState, node.moves)
 
         # if node.turn == "white":
-        #    CustomHeuristic.__computeForWhite(currentState)
+        #    node.heuristic = CustomHeuristic.__computeForWhite(currentState)
         # else:
-        #    CustomHeuristic.__computeForBlack(currentState)
+        #    node.heuristic = CustomHeuristic.__computeForBlack(currentState)
 
         # ########################################
         # TODO: [@contimatteo] remove this logic #
@@ -294,4 +369,4 @@ class CustomHeuristic():
 ###
 
 if __name__ == "__main__":
-    CustomHeuristic.assignValue(None, None, 1)
+    CustomHeuristic.assignValue(None, None)
