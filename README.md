@@ -10,7 +10,7 @@
 - [Client](#client)
   - [Prerequisites](#client-prerequisites)
   - [Installation](#client-installation)
-  - [Usage](#client-usage)
+  - [Fast Usage](#client-fast-usage)
 - [Server](#server)
   - [Prerequisites](#server-prerequisites)
   - [Usage](#server-usage)
@@ -41,7 +41,7 @@ The presentation pitch is available at [this link](./FPM-project-pitch.pdf).
 ### Client Prerequisites
 
 ```sh
-$ chmod +x scripts/*
+$ chmod +x ./pmf.sh
 ```
 
 Install a virtualenv:
@@ -80,18 +80,18 @@ $ fpm_tablut_player
   --server SERVER       server ip address
 ```
 
-### Client Usage
+### Client Fast Usage
 
 Black Player
 
 ```sh
-$ source venv/bin/activate && fpm_tablut_player --role 'black' --timeout 60 --server '127.0.0.1'
+$ ./pmf.sh 'black' 60 '127.0.0.1'
 ```
 
 White Player
 
 ```sh
-$ source venv/bin/activate && fpm_tablut_player --role 'white' --timeout 60 --server '127.0.0.1'
+$ ./pmf.sh 'white' 60 '127.0.0.1'
 ```
 
 <!-- ---------------------------------------------------------------------- -->
