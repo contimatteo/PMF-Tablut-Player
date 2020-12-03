@@ -219,6 +219,14 @@ class CustomHeuristic():
                 closedEscapeByBlack+=1
 
         if heuristicValue >= MAX_HEURISITC_VALUE:
+
+            blackNearKing = 0
+            for black in currentState.BlackList:
+                info = CustomHeuristic.__computeNearstPositionForPoint(currentState,currentState.King,black)
+                if info["adjacent"] == True:
+                    blackNearKing +=1
+
+
             numberOfBlack = CustomHeuristic.__getPlayableEnemyPawns(currentState)
             numberOfWhite = CustomHeuristic.__getPlayablePawns(currentState)
             numberOfkill = CustomHeuristic.__getNumberOfKills(currentState)
@@ -229,7 +237,8 @@ class CustomHeuristic():
             kingDangerFactor = blacksClosedToKingInfo["closedBlack"]
 
             heuristicValue = numberOfBlack-numberOfWhite+numberOfkill - \
-                closedEscapeValue+kingDangerFactor+kingObstacles+closedEscapeByBlack
+                closedEscapeValue+kingDangerFactor+kingObstacles+closedEscapeByBlack - \
+                numberOfBlack
         return (-1) * heuristicValue
 
     @staticmethod
@@ -282,6 +291,13 @@ class CustomHeuristic():
                     closedEscapeValue += (9-escapeInfo["distance"])
 
         if heuristicValue < MAX_HEURISITC_VALUE:
+
+            blackNearKing = 0
+            for black in currentState.BlackList:
+                info = CustomHeuristic.__computeNearstPositionForPoint(currentState,currentState.King,black)
+                if info["adjacent"] == True:
+                    blackNearKing +=1
+
             numberOfBlack = CustomHeuristic.__getPlayableEnemyPawns(currentState)
             numberOfWhite = CustomHeuristic.__getPlayablePawns(currentState)
             numberOfkill = CustomHeuristic.__getNumberOfKills(currentState)
@@ -296,7 +312,7 @@ class CustomHeuristic():
             # DebugUtils.info("KING IN DANGER FACTOR: {}", [kingDangerFactor])
             # DebugUtils.info("KING OBSTACLES {}", [kingObstacles])
             heuristicValue = numberOfWhite-numberOfBlack+numberOfkill + \
-                closedEscapeValue-kingDangerFactor-kingObstacles
+                closedEscapeValue-kingDangerFactor-kingObstacles - blackNearKing
 
         # DebugUtils.info("HEURISTIC VALUE: {}", [heuristicValue])
         return heuristicValue
