@@ -204,9 +204,9 @@ class CustomHeuristic():
 
         closedEscapeValue = 0
         closeEscapesInfoList = CustomHeuristic.__kingNearTheEscapes(currentState)
-        DebugUtils.info("ESCAPES:\n{}\n", [closeEscapesInfoList])
+        # DebugUtils.info("ESCAPES:\n{}\n", [closeEscapesInfoList])
         for escapeInfo in closeEscapesInfoList:
-            DebugUtils.info("THERE IS A CLOSE ESCAPE", [])
+            # DebugUtils.info("THERE IS A CLOSE ESCAPE", [])
             if escapeInfo["adjacent"] == True:
                 heuristicValue = MAX_HEURISITC_VALUE
                 break
@@ -267,7 +267,7 @@ class CustomHeuristic():
         closedEscapeValue = 0
         closeEscapesInfoList = CustomHeuristic.__kingNearTheEscapes(currentState)
         for escapeInfo in closeEscapesInfoList:
-            DebugUtils.info("ESCAPE: {}", [str(escapeInfo)])
+            # DebugUtils.info("ESCAPE: {}", [str(escapeInfo)])
             if escapeInfo["adjacent"] == True:
                 #DebugUtils.info("KING PROSSIMO AD USCIRE",[])
                 heuristicValue = MAX_HEURISITC_VALUE
@@ -284,16 +284,16 @@ class CustomHeuristic():
 
             kingDangerFactor = blacksClosedToKingInfo["closedBlack"] * \
                 blacksClosedToKingInfo["sumDistances"]
-            DebugUtils.info("WHITE: {}", [numberOfWhite])
-            DebugUtils.info("BLACK: {}", [numberOfBlack])
-            DebugUtils.info("KILL: {}", [numberOfkill])
-            DebugUtils.info("CLOSED ESCAPE VALUE: {}", [closedEscapeValue])
-            DebugUtils.info("KING IN DANGER FACTOR: {}", [kingDangerFactor])
-            DebugUtils.info("KING OBSTACLES {}", [kingObstacles])
+            # DebugUtils.info("WHITE: {}", [numberOfWhite])
+            # DebugUtils.info("BLACK: {}", [numberOfBlack])
+            # DebugUtils.info("KILL: {}", [numberOfkill])
+            # DebugUtils.info("CLOSED ESCAPE VALUE: {}", [closedEscapeValue])
+            # DebugUtils.info("KING IN DANGER FACTOR: {}", [kingDangerFactor])
+            # DebugUtils.info("KING OBSTACLES {}", [kingObstacles])
             heuristicValue = numberOfWhite-numberOfBlack+numberOfkill + \
                 closedEscapeValue-kingDangerFactor-kingObstacles
 
-        DebugUtils.info("HEURISTIC VALUE: {}", [heuristicValue])
+        # DebugUtils.info("HEURISTIC VALUE: {}", [heuristicValue])
         return heuristicValue
 
     ###
