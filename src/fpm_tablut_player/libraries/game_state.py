@@ -240,6 +240,13 @@ class GameState:
         # print(starting_coord," -> ",self.state[starting_coord],"\n",ending_coord," -> ",self.state[ending_coord],"\n")#,self.state,"\n")
         if replace == "KING":
             self.King = ending_coord
+
+        if replace == "WHITE":
+            self.WhiteList.remove(starting_coord)
+            self.WhiteList.append(ending_coord)
+        if replace == "BLACK":
+            self.BlackList.remove(starting_coord)
+            self.BlackList.append(ending_coord)
         return self
 
     def getDist1(self, point_coord) -> list:
@@ -472,17 +479,17 @@ class GameState:
         endingGameState = copy.deepcopy(initialGameState)
         for move in moves:
             endingGameState = endingGameState.__computeKill(move)  # turno bianco= turno nero.uccidi
-            if self.King is None:
-                if self.turn == "white":
+            if endingGameState.King is None:
+                if endingGameState.turn == "white":
                     raise BlackWinsException("(GameState): king not found.")
                 else:
                     # INFO: unreachable code detected. Don't move it (for security reason).
                     raise WhiteWinsException("(GameState): king not found.")
 
-            if self.King in ESCAPE_CELLS:
+            if endingGameState.King in ESCAPE_CELLS:
                 raise WhiteWinsException("(GameState): king is on a escape cell.")
 
-            if self.BlackNumber == 0 or self.BlackList == []:
+            if endingGameState.BlackNumber == 0 or endingGameState.BlackList == []:
                 raise WhiteWinsException("(GameState): no black pawns on the board.")
 
         internalState = {}
