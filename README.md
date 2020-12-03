@@ -23,7 +23,7 @@
 
 ## About The Project
 
-...
+The presentation pitch is available at [this link](./FPM-project-pitch.pdf).
 
 ## Challenge
 
