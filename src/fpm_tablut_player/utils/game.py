@@ -17,8 +17,8 @@ class GameUtils:
         return 'white'
 
     @staticmethod
-    def getThroneCell() -> tuple:
-        return (4, 4)
+    def getThroneCells() -> [tuple]:
+        return [(4, 4)]
 
     @staticmethod
     def getCampCells() -> [tuple]:
