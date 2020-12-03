@@ -62,13 +62,11 @@ $ source venv/bin/activate
 
 ```sh
 $ pip install wheel
-$ pip install -r requirements.txt
 $ pip install .
+$ pip install -r requirements.txt
 ```
 
-<!-- ---------------------------------------------------------------------- -->
-
-### Client Usage
+Now you have:
 
 ```sh
 $ fpm_tablut_player
@@ -82,17 +80,19 @@ $ fpm_tablut_player
   --server SERVER       server ip address
 ```
 
-#### Examples
+### Client Usage
 
 Black Player
 
 ```sh
+$ source venv/bin/activate
 $ fpm_tablut_player --role 'black' --timeout 60 --server '127.0.0.1'
 ```
 
 White Player
 
 ```sh
+$ source venv/bin/activate
 $ fpm_tablut_player --role 'white' --timeout 60 --server '127.0.0.1'
 ```
 
