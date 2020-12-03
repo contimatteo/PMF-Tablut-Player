@@ -211,6 +211,15 @@ class GameState:
         else:
             self.state[point_coord] = "EMPTY"
 
+        if self.state[point_coord] == "KING":
+            self.King = None
+        if self.state[point_coord] == "WHITE":
+            self.WhiteNumber-=1
+            self.WhiteList.remove(point_coord)
+        if self.state[point_coord] == "BLACK":
+            self.BlackNumber-=1
+            self.BlackList.remove(point_coord)
+
     def movePawnFromTo(self, starting_coord, ending_coord):
         # change the board moving the pawn
         replace = self.state[starting_coord]
@@ -229,6 +238,15 @@ class GameState:
             DebugUtils.error("I'm moving a pawn on another pawn", [])
         # print("MovePawnFromTo: From ",starting_coord,"to: ",ending_coord,". It's a ",replace," pawn")
         # print(starting_coord," -> ",self.state[starting_coord],"\n",ending_coord," -> ",self.state[ending_coord],"\n")#,self.state,"\n")
+        if replace == "KING":
+            self.King = ending_coord
+
+        if replace == "WHITE":
+            self.WhiteList.remove(starting_coord)
+            self.WhiteList.append(ending_coord)
+        if replace == "BLACK":
+            self.BlackList.remove(starting_coord)
+            self.BlackList.append(ending_coord)
         return self
 
     def getDist1(self, point_coord) -> list:
@@ -461,6 +479,18 @@ class GameState:
         endingGameState = copy.deepcopy(initialGameState)
         for move in moves:
             endingGameState = endingGameState.__computeKill(move)  # turno bianco= turno nero.uccidi
+            if endingGameState.King is None:
+                if endingGameState.turn == "white":
+                    raise BlackWinsException("(GameState): king not found.")
+                else:
+                    # INFO: unreachable code detected. Don't move it (for security reason).
+                    raise WhiteWinsException("(GameState): king not found.")
+
+            if endingGameState.King in ESCAPE_CELLS:
+                raise WhiteWinsException("(GameState): king is on a escape cell.")
+
+            if endingGameState.BlackNumber == 0 or endingGameState.BlackList == []:
+                raise WhiteWinsException("(GameState): no black pawns on the board.")
 
         internalState = {}
         internalState["board"] = endingGameState.state
