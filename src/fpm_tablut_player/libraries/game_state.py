@@ -457,10 +457,6 @@ class GameState:
 
         return self
 
-    def getKilled(self, initialGameState, moves) -> list:
-        TempGameState = GameState().createFromMoves(initialGameState, moves)
-        return TempGameState.FinalDeaths
-
     def createFromMoves(self, initialGameState, moves):
         endingGameState = copy.deepcopy(initialGameState)
         for move in moves:
