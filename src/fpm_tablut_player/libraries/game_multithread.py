@@ -1,5 +1,7 @@
-from multiprocessing.dummy import Pool as ThreadPool
+# from multiprocessing.dummy import Pool as ThreadPool
+from multiprocessing import Process, Queue, Pool, Manager
 import numpy as np
+import copy
 
 import fpm_tablut_player.configs as CONFIGS
 from fpm_tablut_player.algorithms import MinMaxAlgorithm, AlphaBetaCutAlgorithm
@@ -40,117 +42,35 @@ class GameMultithread():
     def __is_my_turn(self) -> bool:
         return str(self.turn) == str(CONFIGS.APP_ROLE)
 
-    def __generateSearchTreeInParallel(self, threadParams: tuple) -> GameTree:
-        currentTurn = GameUtils.turnToString(CONFIGS.APP_ROLE)
-        thread_index = threadParams[0]
-        nodes_generated_counter = 0
-
-        # create the root node
-        rootNode = GameNode().initialize(None, currentTurn, [], 0)
-
-        # create the tree.
-        self.searchTree[thread_index] = GameTree().initialize(rootNode)
-        # prepare the queue for visiting the nodes.
-        nodesToVisit: [GameNode] = [rootNode]
-
-        # start the timer.
-        timer: Timer = Timer().start()
-
-        # start visiting the tree with a BFS search.
-        while nodesToVisit:
-            currentGameState: GameState = None
-            currentRootNode: GameNode = nodesToVisit.pop(0)
-            #
-            # check if the time for generating the tree is not expired.
-            time_left = timer.get_time_left(CONFIGS.GAME_TREE_GENERATION_TIMEOUT)
-            if time_left <= 0:
-                DebugUtils.info("[{}] >> (TreeGeneration) timeout emitted", [thread_index])
-                DebugUtils.info("[{}] >> (TreeGeneration) depth = {}", [
-                    thread_index, currentRootNode.depth])
-                break
-            if currentRootNode.depth > int(CONFIGS._GAME_TREE_MAX_DEPTH):
-                DebugUtils.info("[{}] >> (TreeGeneration) max-depth reached", [thread_index])
-                DebugUtils.info("[{}] >> (TreeGeneration) depth = {}", [
-                    thread_index, currentRootNode.depth])
-                break
-            #
-            # try to create a {GameState} instance starting from a GameNode moves.
-            currentGameState: GameState = None
-            try:
-                currentGameState = GameState().createFromMoves(self.gameState, currentRootNode.moves)
-            except Exception as _:
-                continue
-            # get possible moves
-            moves = currentGameState.getPossibleMoves(currentRootNode.turn)
-            #
-            # if {currentNode} is the root node, then filter the available moves at first level.
-            if currentRootNode.depth == 0:
-                moves = np.array_split(moves, THREADS_COUNT)[thread_index]
-            #
-            # try to the generate childrens of current node.
-            for move in moves:
-                nodes_generated_counter += 1
-                #
-                depth = currentRootNode.depth + 1
-                nextTurn = GameUtils.togglTurn(currentRootNode.turn)
-                movesToSave = list(currentRootNode.moves) + [move]
-                #
-                newNode = GameNode().initialize(currentRootNode, nextTurn, movesToSave, depth)
-                #
-                nodesToVisit.append(newNode)
-                self.searchTree[thread_index].addNode(currentRootNode, [newNode])
-
-        #
-        DebugUtils.info("[{}] >> (TreeGeneration) ended in {} seconds",
-                        [thread_index, timer.get_elapsed_time()])
-        DebugUtils.info("[{}] >> (TreeGeneration) number of generated nodes = {}",
-                        [thread_index, nodes_generated_counter])
-        # stop the timer.
-        timer.stop()
-
-    def __computeNextGameMoveInParallel(self, threadParams: tuple) -> GameMove:
-        thread_index = threadParams[0]
-
-        # generate the search tree.
-        self.__generateSearchTreeInParallel(threadParams)
-
-        # start the timer.
-        timer = Timer().start()
-        # algorithm
-        # algorithm = MinMaxAlgorithm()
-        algorithm = AlphaBetaCutAlgorithm()
-
-        # extract the best node.
-        nodeToReach: GameNode = algorithm.getMorePromisingNode(
-            self.searchTree[thread_index], self.gameState)
-
-        #
-        DebugUtils.info("[{}] >> (AlphaBetaCutAlgorithm) ended in {} seconds",
-                        [thread_index, timer.get_elapsed_time()])
-        # DebugUtils.info("       BEST MOVE {}",[nodeToReach.moves])
-        # stop the timer.
-        timer.stop()
-
-        return nodeToReach
-
     def __multithreadSearchOfBestMove(self) -> GameMove:
-        # params
-        thread_indexes = np.linspace(0, THREADS_COUNT-1, THREADS_COUNT, dtype=np.int).tolist()
-        thread_params = zip(thread_indexes)
+        parallel_jobs = []
+        bestNodesToReach: [GameNode] = []
 
         # #################################################################### #
         # ###################### Start Multithread Mode ###################### #
 
-        # Make the Pool of workers
-        pool = ThreadPool(THREADS_COUNT)
+        multiprocessingManager = Manager()
+        asyncResultNodesQueue = multiprocessingManager.Queue()
 
-        # start the multiprocessing workers ...
-        bestNodesToReach = pool.map(self.__computeNextGameMoveInParallel, thread_params)
-        bestNodesToReach: [GameNode] = [node for node in bestNodesToReach if node is not None]
+        params = []
+        for index in range(THREADS_COUNT):
+            queue = asyncResultNodesQueue
+            gameState = copy.deepcopy(self.gameState)
+            params.append((index, queue, gameState))
 
-        # Close the pool and wait for the thread to finish.
+        pool = Pool(THREADS_COUNT)
+        pool.map(GameProcess.computeNextGameMoveInParallel, params)
         pool.close()
         pool.join()
+
+        # group the results in a list.
+        for index in range(THREADS_COUNT):
+            # gameNode: GameNode = asyncResultNodesQueue.get()
+            gameNode: GameNode = asyncResultNodesQueue.get_nowait()
+            bestNodesToReach.append(gameNode)
+
+        # filter the 'None' values.
+        bestNodesToReach = [node for node in bestNodesToReach if node is not None]
 
         # ####################### End Multithread Mode ####################### #
         # #################################################################### #
@@ -166,11 +86,7 @@ class GameMultithread():
                     bestNodeToReach = currentNode
 
         # extract the move from the best node {nodeToReach}.
-        gameMove = GameMove().fromGameNode(bestNodeToReach)
-
-        DebugUtils.info("server move: {} -> {}", [gameMove.fromCell, gameMove.toCell])
-
-        return gameMove
+        return GameMove().fromGameNode(bestNodeToReach)
 
     def __showGame(self, board):
         B = list(board)
@@ -239,3 +155,110 @@ class GameMultithread():
         game_move_to_server_rappresentation = next_move.export()
         # send the move to the server.
         self.SocketManager.send_json(game_move_to_server_rappresentation)
+
+
+###
+
+class GameProcess():
+
+    @staticmethod
+    def computeNextGameMoveInParallel(params: tuple):
+        thread_index = params[0]
+        asyncResultNodesQueue: Queue = params[1]
+        gameState: GameState = params[2]
+
+        # generate the search tree.
+        searchTree = GameProcess.generateSearchTreeInParallel(params)
+
+        # start the timer.
+        timer = Timer().start()
+        # algorithm
+        # algorithm = MinMaxAlgorithm()
+        algorithm = AlphaBetaCutAlgorithm()
+
+        # extract the best node.
+        nodeToReach: GameNode = algorithm.getMorePromisingNode(searchTree, gameState)
+
+        #
+        DebugUtils.info("[{}] >> (AlphaBetaCutAlgorithm) ended in {} seconds",
+                        [thread_index, timer.get_elapsed_time()])
+        # DebugUtils.info("       BEST MOVE {}",[nodeToReach.moves])
+        # stop the timer.
+        timer.stop()
+
+        # return nodeToReach
+        asyncResultNodesQueue.put(nodeToReach)
+
+    @staticmethod
+    def generateSearchTreeInParallel(params: tuple) -> GameTree:
+        thread_index = params[0]
+        gameState: GameState = params[2]
+
+        #
+        currentTurn = GameUtils.turnToString(CONFIGS.APP_ROLE)
+        nodes_generated_counter = 0
+
+        # create the root node
+        rootNode = GameNode().initialize(None, currentTurn, [], 0)
+
+        # create the tree.
+        searchTree = GameTree().initialize(rootNode)
+        # prepare the queue for visiting the nodes.
+        nodesToVisit: [GameNode] = [rootNode]
+
+        # start the timer.
+        timer: Timer = Timer().start()
+
+        # start visiting the tree with a BFS search.
+        while nodesToVisit:
+            currentGameState: GameState = None
+            currentRootNode: GameNode = nodesToVisit.pop(0)
+            #
+            # check if the time for generating the tree is not expired.
+            time_left = timer.get_time_left(CONFIGS.GAME_TREE_GENERATION_TIMEOUT)
+            if time_left <= 0:
+                DebugUtils.info("[{}] >> (TreeGeneration) timeout emitted", [thread_index])
+                DebugUtils.info("[{}] >> (TreeGeneration) depth = {}", [
+                    thread_index, currentRootNode.depth])
+                break
+            if currentRootNode.depth > int(CONFIGS._GAME_TREE_MAX_DEPTH):
+                DebugUtils.info("[{}] >> (TreeGeneration) max-depth reached", [thread_index])
+                DebugUtils.info("[{}] >> (TreeGeneration) depth = {}", [
+                    thread_index, currentRootNode.depth])
+                break
+            #
+            # try to create a {GameState} instance starting from a GameNode moves.
+            currentGameState: GameState = None
+            try:
+                currentGameState = GameState().createFromMoves(gameState, currentRootNode.moves)
+            except Exception as _:
+                continue
+            # get possible moves
+            moves = currentGameState.getPossibleMoves(currentRootNode.turn)
+            #
+            # if {currentNode} is the root node, then filter the available moves at first level.
+            if currentRootNode.depth == 0:
+                moves = np.array_split(moves, THREADS_COUNT)[thread_index]
+            #
+            # try to the generate childrens of current node.
+            for move in moves:
+                nodes_generated_counter += 1
+                #
+                depth = currentRootNode.depth + 1
+                nextTurn = GameUtils.togglTurn(currentRootNode.turn)
+                movesToSave = list(currentRootNode.moves) + [move]
+                #
+                newNode = GameNode().initialize(currentRootNode, nextTurn, movesToSave, depth)
+                #
+                nodesToVisit.append(newNode)
+                searchTree.addNode(currentRootNode, [newNode])
+
+        #
+        DebugUtils.info("[{}] >> (TreeGeneration) ended in {} seconds",
+                        [thread_index, timer.get_elapsed_time()])
+        DebugUtils.info("[{}] >> (TreeGeneration) number of generated nodes = {}",
+                        [thread_index, nodes_generated_counter])
+        # stop the timer.
+        timer.stop()
+
+        return searchTree
